@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="logo.svg"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -25,16 +25,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9195959"
-     inkscape:cx="91.933137"
-     inkscape:cy="47.548593"
+     inkscape:zoom="2.8"
+     inkscape:cx="-12.489655"
+     inkscape:cy="75.676037"
      inkscape:document-units="mm"
      inkscape:current-layer="g829"
      showgrid="false"
-     inkscape:window-width="1858"
-     inkscape:window-height="1058"
-     inkscape:window-x="54"
-     inkscape:window-y="-8"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="34"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -67,17 +67,27 @@
          cx="48.299889"
          id="path819"
          style="fill:#e67e22;fill-opacity:1;stroke:#e67e22;stroke-width:0.3889375;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text817"
-         y="76.335434"
-         x="42.235317"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.57151985px;line-height:1.25;font-family:Harrington;-inkscape-font-specification:'Harrington, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.48928621"
-         xml:space="preserve"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.57151985px;font-family:Harrington;-inkscape-font-specification:'Harrington, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;stroke-width:0.48928621"
-           y="76.335434"
-           x="42.235317"
-           id="tspan815"
-           sodipodi:role="line">D</tspan></text>
+      <g
+         id="g827"
+         transform="translate(0.25565569,-0.27105666)">
+        <g
+           transform="matrix(0.94293241,0,0,0.84242968,3.0341091,10.969562)"
+           id="text817"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.5716114px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.48928621"
+           aria-label="D">
+          <path
+             sodipodi:nodetypes="cszsccccszsc"
+             inkscape:connector-curvature="0"
+             id="path817"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.5716114px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;stroke-width:0.48928621"
+             d="m 45.225963,77.278618 h 4.40143 c 4.325326,0 6.693491,-3.132722 6.693491,-7.221925 0,-4.089203 -2.368165,-7.143638 -6.771778,-7.143638 h -4.323143 z m 2.542126,-2.163524 3.14e-4,-10.038464 h 1.624444 c 3.385889,0 4.914108,2.236446 4.914108,4.980063 0,2.743617 -1.528533,5.058401 -4.914422,5.058401 z" />
+        </g>
+        <path
+           inkscape:connector-curvature="0"
+           id="path822"
+           d="M 43.208281,63.969218 V 76.071461"
+           style="fill:#ffffff;stroke:#ffffff;stroke-width:3.4256959;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      </g>
     </g>
   </g>
 </svg>
