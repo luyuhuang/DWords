@@ -65,12 +65,3 @@ def initialize():
 
         c.execute("update sys set value = ? where id = 'version'", (len(VERSIONs) - 1,))
 
-# with user_db.cursor() as c:
-#     for word, paraphrase in [
-#         ("apple", "苹果"),
-#         ("banana", "香蕉"),
-#         ("pear", "梨"),
-#         ("orange", "橙子"),
-#         ("peach", "桃子")
-#     ]:
-#         c.execute("insert into words(word, paraphrase) values(?, ?)", (word, paraphrase))

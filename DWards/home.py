@@ -7,19 +7,21 @@ import random
 import utils
 
 class Home(QWidget):
+    onClickBurst = pyqtSignal()
+    onClickSetting = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self._danmus = set()
         self._closing = False
         self._is_hid_paraphrase = False
+        self._list_order = 'Time'
 
         self.initUI()
 
         self.show()
-        self.activateWindow()
 
     def initUI(self):
-        self.setGeometry(300, 300, 500, 300)
         self.setWindowTitle("DWords")
         self.setWindowIcon(QIcon("img/logo.svg"))
 
@@ -81,7 +83,9 @@ class Home(QWidget):
         body.addLayout(list_btns)
 
         burst = QPushButton("Burst!")
+        burst.clicked.connect(self.clickBurst)
         setting = QPushButton("Setting")
+        setting.clicked.connect(self.clickSetting)
         sync = QPushButton("Sync")
 
         btns = QHBoxLayout()
@@ -101,11 +105,13 @@ class Home(QWidget):
         layout = QVBoxLayout()
         editor.setLayout(layout)
 
-        text = QTextEdit()
-        text.setMinimumHeight(100)
-        layout.addWidget(text)
+        word_editor = QTextEdit()
+        word_editor.setMinimumHeight(100)
+        layout.addWidget(word_editor)
+        self._word_editor = word_editor
 
         commit = QPushButton("Commit")
+        commit.clicked.connect(self.commitWord)
         close = QPushButton("Close")
         close.clicked.connect(self.clickCloseEditor)
 
@@ -118,15 +124,42 @@ class Home(QWidget):
 
         return editor
 
+    def keyPressEvent(self, e):
+        if e.modifiers() == Qt.ControlModifier and e.key() == Qt.Key_Return:
+            self.commitWord()
+
+    def commitWord(self):
+        text = self._word_editor.toPlainText()
+        while True:
+            if len(text) == 0: break
+
+            word, *paraphrase = text.splitlines()
+            paraphrase = '\n'.join(paraphrase)
+            if len(word) == 0 or len(paraphrase) == 0: break
+
+            utils.add_words((word, paraphrase))
+            self.initLists()
+
+            break
+
+        self._word_editor.clear()
+
     def clickCloseEditor(self):
+        self._word_editor.clear()
         self._editor.hide()
 
-    def initLists(self, order="Time"):
+    def clickBurst(self):
+        self.onClickBurst.emit()
+
+    def clickSetting(self):
+        self.onClickSetting.emit()
+
+    def initLists(self):
         def create_item(word, paraphrase, cleared):
             item = QTreeWidgetItem()
             item.setText(0, word)
-            item.setText(1, paraphrase.splitlines()[0])
-            item.setToolTip(1, paraphrase)
+            item.setText(1, '' if self._is_hid_paraphrase else paraphrase.splitlines()[0])
+            item.setToolTip(1, '' if self._is_hid_paraphrase else paraphrase)
             item.cleared = cleared
             item.paraphrase = paraphrase
             if cleared:
@@ -134,17 +167,17 @@ class Home(QWidget):
                 item.setForeground(1, QBrush(QColor(0x27ae60)))
             return item
 
-        if order == "A-Z":
+        if self._list_order == "A-Z":
             order_by = "order by word"
-        elif order == "Time":
+        elif self._list_order == "Time":
             order_by = "order by id desc"
 
         self._curr_words.clear()
-        for word, paraphrase in user_db.getAll("select word, paraphrase from words where cleared = false " + order_by):
+        for word, paraphrase in user_db.getAll("select word, paraphrase from words where cleared = 0 " + order_by):
             self._curr_words.addTopLevelItem(create_item(word, paraphrase, False))
 
         self._cleared_words.clear()
-        for word, paraphrase in user_db.getAll("select word, paraphrase from words where cleared = true " + order_by):
+        for word, paraphrase in user_db.getAll("select word, paraphrase from words where cleared = 1 " + order_by):
             self._cleared_words.addTopLevelItem(create_item(word, paraphrase, True))
 
         self._all_words.clear()
@@ -154,7 +187,8 @@ class Home(QWidget):
     def clickOrder(self, e):
         if e:
             rbtn = self.sender()
-            self.initLists(rbtn.text())
+            self._list_order = rbtn.text()
+            self.initLists()
 
     def clickList(self, item):
         if not self._is_hid_paraphrase: return
@@ -182,7 +216,8 @@ class Home(QWidget):
 
         menu = QMenu(self)
         menu.word = item.text(0)
-        menu.addAction("Detail").triggered.connect(self.clickMenu)
+        menu.paraphrase = item.paraphrase
+        menu.addAction("Edit").triggered.connect(self.clickMenu)
         menu.addAction("Redo" if item.cleared else "Clear").triggered.connect(self.clickMenu)
         menu.addAction("Delete").triggered.connect(self.clickMenu)
         menu.exec(list_.mapToGlobal(pos))
@@ -191,8 +226,12 @@ class Home(QWidget):
         action = self.sender()
         act = action.text()
         word = action.parent().word
+        paraphrase = action.parent().paraphrase
         refresh = False
-        if act == "Clear":
+        if act == "Edit":
+            self._editor.show()
+            self._word_editor.setText('\n'.join((word, paraphrase)))
+        elif act == "Clear":
             utils.clear_words(word)
             refresh = True
         elif act == "Redo":
@@ -215,5 +254,4 @@ class Home(QWidget):
 
     def closeEvent(self, e):
         self.hide()
-        self._editor.close()
         e.ignore()

@@ -1,47 +1,75 @@
 import utils
 import random
 from PyQt5.QtWidgets import QDesktopWidget
-from PyQt5.QtCore import QTimer, QObject
+from PyQt5.QtCore import QTimer, QObject, pyqtSignal
 from danmuku import Danmuku
 from db import user_db
 
 class Launcher(QObject):
+    onChangeWordCleared = pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
         self._danmus = set()
-        self._closing = False
+        self._burst_words = set()
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.newDanmu)
         self._timer.start(6000)
 
     def newDanmu(self):
-        info = utils.random_one_word(*(danmu._word for danmu in self._danmus))
-        if not info: return
-        word, paraphrase, show_paraphrase, color = info
+        if self._burst_words:
+            word = random.choice(list(self._burst_words))
+            paraphrase, show_paraphrase, color = user_db.getOne(
+                "select paraphrase, show_paraphrase, color from words where word = ?", (word,)
+            )
+            self._burst_words.remove(word)
+            if not self._burst_words:
+                self._timer.stop()
+                self._timer.start(6000)
+        else:
+            info = utils.random_one_word(*(danmu._word for danmu in self._danmus))
+            if not info: return
+            word, paraphrase, show_paraphrase, color = info
 
         height = QDesktopWidget().availableGeometry().height()
         y = random.randrange(0, height / 2)
         danmu = Danmuku(word, paraphrase, y, show_paraphrase, color)
-        danmu.onCloseDanmu.connect(self.onDanmuClose)
+        danmu.onClose.connect(self.onDanmuClose)
+        danmu.onModified.connect(self.modifyWord)
         self._danmus.add(danmu)
 
     def onDanmuClose(self):
         danmu = self.sender()
+        self._danmus.remove(danmu)
 
+    def modifyWord(self, attr):
+        danmu = self.sender()
         with user_db.cursor() as c:
-            c.execute("update words "
-                "set show_paraphrase = ?, color = ?, cleared = ? "
-                "where word = ?",
-                (danmu._show_paraphrase, danmu._color, danmu._cleared, danmu._word)
+            c.execute(
+                f"update words set {attr} = ? where word = ?",
+                (getattr(danmu, attr), danmu._word)
             )
 
-        if not self._closing:
-            self._danmus.remove(danmu)
+        if attr == "cleared":
+            self.onChangeWordCleared.emit(danmu._word)
 
-    def close(self):
-        self._closing = True
+    def clear(self):
         for danmu in self._danmus:
+            danmu.onClose.disconnect(self.onDanmuClose)
             danmu.close()
 
+        self._danmus = set()
+
     def burst(self):
-        pass
+        if self._burst_words: return
+
+        curr_words = [danmu._word for danmu in self._danmus]
+        words = user_db.getAll("select word from words "
+            f"where cleared = 0 and word not in ({','.join('?' * len(curr_words))})",
+            curr_words
+        )
+        self._burst_words = set(map(lambda e: e[0], words))
+        if not self._burst_words: return
+
+        self._timer.stop()
+        self._timer.start(700)

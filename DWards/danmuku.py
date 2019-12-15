@@ -1,60 +1,123 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QDesktopWidget, QRadioButton, QHBoxLayout, QVBoxLayout, QLabel, QMainWindow
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon, QFont, QMouseEvent
+from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal, QRect
+import utils
+
+class WordLabel(QLabel):
+    onEnter = pyqtSignal()
+    onLeave = pyqtSignal()
+    onMousePress = pyqtSignal(QMouseEvent)
+    onMouseMove = pyqtSignal(QMouseEvent)
+    onMouseRelease = pyqtSignal(QMouseEvent)
+
+    def __init__(self, *argv, **kw):
+        super().__init__(*argv, **kw)
+
+        self.installEventFilter(self)
+
+    def enterEvent(self, e):
+        self.onEnter.emit()
+    
+    def leaveEvent(self, e):
+        self.onLeave.emit()
+
+    def mousePressEvent(self, e):
+        self.onMousePress.emit(e)
+
+    def mouseMoveEvent(self, e):
+        self.onMouseMove.emit(e)
+
+    def mouseReleaseEvent(self, e):
+        self.onMouseRelease.emit(e)
 
 class Danmuku(QWidget):
-    COLORS = {
-        'red': ("231,76,60", "255,255,255"),
-        'yellow': ("241,196,15", "255,255,255"),
-        'orange': ("243,156,18", "255,255,255"),
-        'cyan': ("26,188,156", "255,255,255"),
-        'green': ("46,204,113", "255,255,255"),
-        'blue': ("52,152,219", "255,255,255"),
-        'purple': ("155,89,182", "255,255,255"),
-        'white': ("236,240,241", "0,0,0"),
-    }
-
-    onCloseDanmu = pyqtSignal()
+    onClose = pyqtSignal()
+    onModified = pyqtSignal(str)
 
     def __init__(self, word, paraphrase, y, show_paraphrase = True, color = 'white'):
         super().__init__()
         self._word = word
         self._paraphrase = paraphrase
-        self._show_paraphrase = show_paraphrase
-        self._color = color
         self._stop_move = False
         self._show_detail = False
+
+        self.modified = False
+        self._show_paraphrase = show_paraphrase
+        self._color = color
         self._cleared = False
 
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
+        self.setWindowFlags(
+            self.windowFlags() | 
+            Qt.WindowStaysOnTopHint | 
+            Qt.FramelessWindowHint | 
+            Qt.Tool | 
+            Qt.X11BypassWindowManagerHint  # for gnome
+        )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WA_QuitOnClose)
 
         self.initUI()
         self.initPosition(y)
 
-        self.installEventFilter(self)
+        # self.installEventFilter(self)
 
-    def eventFilter(self, o, e):
-        if e.type() == QEvent.WindowDeactivate:
-            self._show_detail = False
-            self._stop_move = False
-            self.setWindowOpacity(0.5)
-            self._continenter.hide()
-            return False
+    # def eventFilter(self, o, e):
+    #     # due to flag `X11BypassWindowManagerHint`, event `WindowDeactivate` doesn't work
+    #     if e.type() == QEvent.WindowDeactivate: 
+    #         self._show_detail = False
+    #         self._stop_move = False
+    #         self.setWindowOpacity(0.5)
+    #         self._continenter.hide()
+    #         return False
 
-        return super().eventFilter(o, e)
+    #     return super().eventFilter(o, e)
+
+    @property
+    def show_paraphrase(self):
+        return self._show_paraphrase
+
+    @show_paraphrase.setter
+    def show_paraphrase(self, value):
+        self._show_paraphrase = value
+        self.modified = True
+        self.onModified.emit('show_paraphrase')
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        self._color = value
+        self.modified = True
+        self.onModified.emit('color')
+
+    @property
+    def cleared(self):
+        return self._cleared
+
+    @cleared.setter
+    def cleared(self, value):
+        self._cleared = value
+        self.modified = True
+        self.onModified.emit('cleared')
 
     def setWordQss(self):
-        bg_color, font_color = Danmuku.COLORS[self._color]
+        bg_color, font_color = utils.COLORS[self.color]
         self._word_label.setStyleSheet(f"QLabel{{background-color:rgb({bg_color}); color:rgb({font_color}); padding:5; border-radius:6px}}")
 
     def initUI(self):
         self.setWindowOpacity(0.5)
 
-        word = QLabel(self._word, self)
-        if self._show_paraphrase:
+        word = WordLabel(self._word)
+        if self.show_paraphrase:
             word.setText(word.text() + " " + self._paraphrase.splitlines()[0])
+
+        word.onEnter.connect(self.enterWordEvent)
+        word.onLeave.connect(self.leaveWordEvent)
+        word.onMousePress.connect(self.mousePressWordEvent)
+        word.onMouseMove.connect(self.mouseMoveWordEvent)
+        word.onMouseRelease.connect(self.mouseReleaseWordEvent)
 
         self._word_label = word
 
@@ -89,14 +152,14 @@ class Danmuku(QWidget):
         detail.addWidget(paraphrase)
 
         rbtns = QHBoxLayout()
-        for name, (color, _) in Danmuku.COLORS.items():
+        for name, (color, _) in utils.COLORS.items():
             rbtn = QRadioButton(None)
             qss = f"""
             QRadioButton::indicator {{ width:13px; height:13px; background-color:rgb({color}); border: 2px solid rgb({color}); }}
             QRadioButton::indicator:checked {{ border: 2px solid black; }}
             """
             rbtn.setStyleSheet(qss)
-            rbtn.setChecked(name == self._color)
+            rbtn.setChecked(name == self.color)
             rbtn.toggled.connect(self.clickColor)
             rbtn.color = name
 
@@ -110,7 +173,7 @@ class Danmuku(QWidget):
         clear.clicked.connect(self.clickClear)
         btns.addWidget(clear)
 
-        switch_paraphrase = QPushButton("Hide Paraphrase" if self._show_paraphrase else "Show Paraphrase")
+        switch_paraphrase = QPushButton("Hide Paraphrase" if self.show_paraphrase else "Show Paraphrase")
         switch_paraphrase.clicked.connect(self.clickSwitch)
         btns.addWidget(switch_paraphrase)
         self._switch_paraphrase = switch_paraphrase
@@ -123,41 +186,41 @@ class Danmuku(QWidget):
     def clickColor(self, e):
         if e:
             sender = self.sender()
-            self._color = sender.color
+            self.color = sender.color
             self.setWordQss()
 
     def clickClear(self):
-        self._cleared = not self._cleared
-        self._clear.setText("Redo" if self._cleared else "Clear")
+        self.cleared = not self.cleared
+        self._clear.setText("Redo" if self.cleared else "Clear")
 
     def clickSwitch(self):
-        self._show_paraphrase = not self._show_paraphrase
-        if self._show_paraphrase:
+        self.show_paraphrase = not self.show_paraphrase
+        if self.show_paraphrase:
             self._word_label.setText(self._word + self._paraphrase.splitlines()[0])
         else:
             self._word_label.setText(self._word)
 
-        self._switch_paraphrase.setText("Hide Paraphrase" if self._show_paraphrase else "Show Paraphrase")
+        self._switch_paraphrase.setText("Hide Paraphrase" if self.show_paraphrase else "Show Paraphrase")
 
-    def enterEvent(self, e):
+    def enterWordEvent(self):
         self.setWindowOpacity(1)
 
-    def leaveEvent(self, e):
+    def leaveWordEvent(self):
         if not self._show_detail:
             self.setWindowOpacity(0.5)
 
-    def mousePressEvent(self, e):
+    def mousePressWordEvent(self, e):
         if e.button() == Qt.LeftButton:
             self._press_point = e.globalPos() - self.pos()
             self._press_start = e.globalPos()
             e.accept()
 
-    def mouseMoveEvent(self, e):
+    def mouseMoveWordEvent(self, e):
         if e.buttons() & Qt.LeftButton:
             self.move(e.globalPos() - self._press_point)
             e.accept()
 
-    def mouseReleaseEvent(self, e):
+    def mouseReleaseWordEvent(self, e):
         if (e.globalPos() - self._press_start).manhattanLength() < 10:
             self._show_detail = not self._show_detail
             if self._show_detail:
@@ -184,5 +247,5 @@ class Danmuku(QWidget):
             self.close()
 
     def closeEvent(self, e):
-        self.onCloseDanmu.emit()
+        self.onClose.emit()
 

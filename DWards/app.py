@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import QCoreApplication
 from home import Home
 from launcher import Launcher
+from setting import Setting
 from db import user_db, initialize
 
 class App(QApplication):
@@ -11,6 +12,11 @@ class App(QApplication):
         initialize()
         self._launcher = Launcher()
         self._home = Home()
+        self._setting = None
+
+        self._home.onClickBurst.connect(self.clickBurst)
+        self._home.onClickSetting.connect(self.clickSetting)
+        self._launcher.onChangeWordCleared.connect(self._home.initLists)
 
         self.setQuitOnLastWindowClosed(False)
         self.setTrayIcon()
@@ -40,9 +46,17 @@ class App(QApplication):
         pass
 
     def clickSetting(self):
-        pass
+        if self._setting:
+            self._setting.showNormal()
+            self._setting.activateWindow()
+        else:
+            self._setting = Setting()
+            self._setting.onClose.connect(self.onSettingClose)
+
+    def onSettingClose(self):
+        self._setting = None
 
     def clickExit(self):
-        self._launcher.close()
+        self._launcher.clear()
         user_db.close()
         self.quit()
