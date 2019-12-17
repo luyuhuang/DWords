@@ -17,7 +17,7 @@ class WordLabel(QLabel):
 
     def enterEvent(self, e):
         self.onEnter.emit()
-    
+
     def leaveEvent(self, e):
         self.onLeave.emit()
 
@@ -34,7 +34,7 @@ class Danmuku(QWidget):
     onClose = pyqtSignal()
     onModified = pyqtSignal(str)
 
-    def __init__(self, word, paraphrase, y, show_paraphrase = True, color = 'white'):
+    def __init__(self, word, paraphrase, y, show_paraphrase = None, color = None):
         super().__init__()
         self._word = word
         self._paraphrase = paraphrase
@@ -42,15 +42,18 @@ class Danmuku(QWidget):
         self._show_detail = False
 
         self.modified = False
-        self._show_paraphrase = show_paraphrase
-        self._color = color
+        self._show_paraphrase = show_paraphrase \
+            if show_paraphrase is not None else \
+            utils.get_setting("danmuku_default_show_paraphrase")
+        self._color = color if color is not None else \
+            utils.get_setting("danmuku_default_color")
         self._cleared = False
 
         self.setWindowFlags(
-            self.windowFlags() | 
-            Qt.WindowStaysOnTopHint | 
-            Qt.FramelessWindowHint | 
-            Qt.Tool | 
+            self.windowFlags() |
+            Qt.WindowStaysOnTopHint |
+            Qt.FramelessWindowHint |
+            Qt.Tool |
             Qt.X11BypassWindowManagerHint  # for gnome
         )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
@@ -63,7 +66,7 @@ class Danmuku(QWidget):
 
     # def eventFilter(self, o, e):
     #     # due to flag `X11BypassWindowManagerHint`, event `WindowDeactivate` doesn't work
-    #     if e.type() == QEvent.WindowDeactivate: 
+    #     if e.type() == QEvent.WindowDeactivate:
     #         self._show_detail = False
     #         self._stop_move = False
     #         self.setWindowOpacity(0.5)
@@ -107,7 +110,7 @@ class Danmuku(QWidget):
         self._word_label.setStyleSheet(f"QLabel{{background-color:rgb({bg_color}); color:rgb({font_color}); padding:5; border-radius:6px}}")
 
     def initUI(self):
-        self.setWindowOpacity(0.5)
+        self.setWindowOpacity(utils.get_setting("danmuku_transparency"))
 
         word = WordLabel(self._word)
         if self.show_paraphrase:
@@ -196,7 +199,7 @@ class Danmuku(QWidget):
     def clickSwitch(self):
         self.show_paraphrase = not self.show_paraphrase
         if self.show_paraphrase:
-            self._word_label.setText(self._word + self._paraphrase.splitlines()[0])
+            self._word_label.setText(self._word + " " + self._paraphrase.splitlines()[0])
         else:
             self._word_label.setText(self._word)
 
@@ -207,7 +210,7 @@ class Danmuku(QWidget):
 
     def leaveWordEvent(self):
         if not self._show_detail:
-            self.setWindowOpacity(0.5)
+            self.setWindowOpacity(utils.get_setting("danmuku_transparency"))
 
     def mousePressWordEvent(self, e):
         if e.button() == Qt.LeftButton:
@@ -233,7 +236,8 @@ class Danmuku(QWidget):
     def initPosition(self, y):
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.update)
-        self._timer.start(12)
+        speed = utils.get_setting("danmuku_speed")
+        self._timer.start(1 / speed)
 
         w = QDesktopWidget().availableGeometry().width()
         self.move(w, y)

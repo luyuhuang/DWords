@@ -14,7 +14,7 @@ class Launcher(QObject):
         self._burst_words = set()
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.newDanmu)
-        self._timer.start(6000)
+        self._timer.start(utils.get_setting("danmuku_frequency"))
 
     def newDanmu(self):
         if self._burst_words:
@@ -23,13 +23,11 @@ class Launcher(QObject):
                 "select paraphrase, show_paraphrase, color from words where word = ?", (word,)
             )
             self._burst_words.remove(word)
-            if not self._burst_words:
-                self._timer.stop()
-                self._timer.start(6000)
         else:
             info = utils.random_one_word(*(danmu._word for danmu in self._danmus))
             if not info: return
             word, paraphrase, show_paraphrase, color = info
+            self._timer.setInterval(utils.get_setting("danmuku_frequency"))
 
         height = QDesktopWidget().availableGeometry().height()
         y = random.randrange(0, height / 2)
@@ -71,5 +69,4 @@ class Launcher(QObject):
         self._burst_words = set(map(lambda e: e[0], words))
         if not self._burst_words: return
 
-        self._timer.stop()
-        self._timer.start(700)
+        self._timer.setInterval(700)

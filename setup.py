@@ -1,4 +1,4 @@
-from src.version import VERSION
+from DWords.version import VERSION
 from setuptools import setup
 
 setup(

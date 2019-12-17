@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="logo.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -25,17 +25,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="-12.489655"
-     inkscape:cy="75.676037"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-116.95482"
+     inkscape:cy="59.502855"
      inkscape:document-units="mm"
      inkscape:current-layer="g829"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
-     inkscape:window-x="0"
-     inkscape:window-y="34"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1858"
+     inkscape:window-height="1058"
+     inkscape:window-x="112"
+     inkscape:window-y="50"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -69,7 +69,7 @@
          style="fill:#e67e22;fill-opacity:1;stroke:#e67e22;stroke-width:0.3889375;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <g
          id="g827"
-         transform="translate(0.25565569,-0.27105666)">
+         transform="matrix(0.8706524,0,0,0.8706524,6.5701679,8.7859059)">
         <g
            transform="matrix(0.94293241,0,0,0.84242968,3.0341091,10.969562)"
            id="text817"

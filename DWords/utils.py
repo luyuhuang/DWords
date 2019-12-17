@@ -8,6 +8,7 @@ COLORS = {
     'green': ("46,204,113", "255,255,255"),
     'blue': ("52,152,219", "255,255,255"),
     'purple': ("155,89,182", "255,255,255"),
+    'dark': ("52,73,94", "255,255,255"),
     'white': ("236,240,241", "0,0,0"),
 }
 
@@ -35,3 +36,42 @@ def add_words(*words):
         for word, paraphrase in words:
             c.execute("update words set paraphrase = ? where word = ?", (paraphrase, word))
             c.execute("insert or ignore into words(word, paraphrase) values(?, ?)", (word, paraphrase))
+
+DEFAULT_SETTING = {
+    "email": None,
+    "password": None,
+    "smtp_server": None,
+    "pop3_server": None,
+    "sync_frequency": 1000 * 60 * 5,
+
+    "danmuku_speed": 1 / 12,
+    "danmuku_frequency": 6000,
+    "danmuku_default_show_paraphrase": False,
+    "danmuku_default_color": "white",
+    "danmuku_transparency": 0.5,
+}
+
+def get_setting(key):
+    value = user_db.getOne("select value from setting where key = ?", (key,))
+    if value is None: return DEFAULT_SETTING[key]
+    return eval(value[0])
+
+def set_setting(key, value):
+    value = repr(value)
+    with user_db.cursor() as c:
+        c.execute("update setting set value = ? where key = ?", (value, key))
+        c.execute("insert or ignore into setting(key, value) values(?, ?)", (key, value))
+
+VALUE_RANGE = {
+    "danmuku_speed": (1 / 9, 1 / 18),
+    "danmuku_frequency": (3000, 20000),
+    "danmuku_transparency": (0.3, 1.0),
+}
+
+def progress2value(key, progress):
+    MIN, MAX = VALUE_RANGE[key]
+    return MIN + (MAX - MIN) * (progress / 99)
+
+def value2progress(key, value):
+    MIN, MAX = VALUE_RANGE[key]
+    return int((value - MIN) / (MAX - MIN) * 99)

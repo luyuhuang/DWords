@@ -24,6 +24,7 @@ class Home(QWidget):
     def initUI(self):
         self.setWindowTitle("DWords")
         self.setWindowIcon(QIcon("img/logo.svg"))
+        self.setMinimumWidth(400)
 
         body = QVBoxLayout()
         self.setLayout(body)
@@ -34,10 +35,12 @@ class Home(QWidget):
         head.addWidget(icon)
 
         title = QLabel("DWords")
-        title.setFont(QFont("Consolas", 24))
+        title.setFont(QFont("Consolas", 18))
+        title.font().setStyleStrategy(QFont.PreferAntialias)
         head.addWidget(title)
         head.addStretch(1)
         body.addLayout(head)
+        body.addSpacing(8)
 
         lists = QTabWidget()
         lists.setMinimumHeight(300)
@@ -47,6 +50,7 @@ class Home(QWidget):
             tree.setContextMenuPolicy(Qt.CustomContextMenu)
             tree.customContextMenuRequested.connect(self.listMenu)
             tree.itemClicked.connect(self.clickList)
+            tree.itemDoubleClicked.connect(self.doubleClickList)
             tree.setColumnCount(2)
             tree.setHeaderLabels(["Word", "Paraphrase"])
             return tree
@@ -124,6 +128,15 @@ class Home(QWidget):
 
         return editor
 
+    def showEditor(self, word=None, paraphrase=None):
+        self._editor.show()
+        if word is not None and paraphrase is not None:
+            self._word_editor.setText(word + '\n' + paraphrase)
+
+    def hideEditor(self):
+        self._editor.hide()
+        self._word_editor.clear()
+
     def keyPressEvent(self, e):
         if e.modifiers() == Qt.ControlModifier and e.key() == Qt.Key_Return:
             self.commitWord()
@@ -145,8 +158,7 @@ class Home(QWidget):
         self._word_editor.clear()
 
     def clickCloseEditor(self):
-        self._word_editor.clear()
-        self._editor.hide()
+        self.hideEditor()
 
     def clickBurst(self):
         self.onClickBurst.emit()
@@ -199,6 +211,9 @@ class Home(QWidget):
             item.setText(1, '')
             item.setToolTip(1, '')
 
+    def doubleClickList(self, item):
+        self.showEditor(item.text(0), item.paraphrase)
+
     def clickHideParaphrase(self, e):
         self._is_hid_paraphrase = e
         for list_ in (self._curr_words, self._cleared_words, self._all_words):
@@ -229,8 +244,7 @@ class Home(QWidget):
         paraphrase = action.parent().paraphrase
         refresh = False
         if act == "Edit":
-            self._editor.show()
-            self._word_editor.setText('\n'.join((word, paraphrase)))
+            self.showEditor(word, paraphrase)
         elif act == "Clear":
             utils.clear_words(word)
             refresh = True
@@ -250,7 +264,7 @@ class Home(QWidget):
             self.initLists()
 
     def clickAdd(self):
-        self._editor.show()
+        self.showEditor()
 
     def closeEvent(self, e):
         self.hide()
