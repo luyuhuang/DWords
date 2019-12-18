@@ -30,7 +30,7 @@ class Launcher(QObject):
             self._timer.setInterval(utils.get_setting("danmuku_frequency"))
 
         height = QDesktopWidget().availableGeometry().height()
-        y = random.randrange(0, height / 2)
+        y = random.randrange(0, int(height / 2))
         danmu = Danmuku(word, paraphrase, y, show_paraphrase, color)
         danmu.onClose.connect(self.onDanmuClose)
         danmu.onModified.connect(self.modifyWord)

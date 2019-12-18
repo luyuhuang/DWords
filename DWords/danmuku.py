@@ -53,7 +53,7 @@ class Danmuku(QWidget):
             self.windowFlags() |
             Qt.WindowStaysOnTopHint |
             Qt.FramelessWindowHint |
-            Qt.Tool |
+            Qt.ToolTip |
             Qt.X11BypassWindowManagerHint  # for gnome
         )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
@@ -149,6 +149,7 @@ class Danmuku(QWidget):
 
         paraphrase = QLabel(self._paraphrase)
         paraphrase.setFont(QFont("Consolas", 15))
+        paraphrase.setStyleSheet("QLabel{color:black;}")
         paraphrase.setWordWrap(True)
         paraphrase.setMaximumWidth(300)
 
@@ -173,10 +174,12 @@ class Danmuku(QWidget):
         btns = QHBoxLayout()
 
         clear = QPushButton("Clear")
+        clear.setStyleSheet("QPushButton{color:black;}")
         clear.clicked.connect(self.clickClear)
         btns.addWidget(clear)
 
         switch_paraphrase = QPushButton("Hide Paraphrase" if self.show_paraphrase else "Show Paraphrase")
+        switch_paraphrase.setStyleSheet("QPushButton{color:black;}")
         switch_paraphrase.clicked.connect(self.clickSwitch)
         btns.addWidget(switch_paraphrase)
         self._switch_paraphrase = switch_paraphrase
