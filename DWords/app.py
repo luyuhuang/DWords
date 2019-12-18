@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import QCoreApplication
-from home import Home
-from launcher import Launcher
-from setting import Setting
-from db import user_db, initialize
+from .home import Home
+from .launcher import Launcher
+from .setting import Setting
+from .db import user_db, initialize
+from .utils import real_path
 
 class App(QApplication):
     def __init__(self, argv):
@@ -22,7 +23,7 @@ class App(QApplication):
         self.setTrayIcon()
 
     def setTrayIcon(self):
-        tray_icon = QSystemTrayIcon(QIcon("img/logo.svg"), self)
+        tray_icon = QSystemTrayIcon(QIcon(real_path("img/logo.svg")), self)
         tray_icon.show()
         menu = QMenu()
         menu.addAction("Burst!").triggered.connect(self.clickBurst)

@@ -1,9 +1,9 @@
-import utils
 import random
 from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5.QtCore import QTimer, QObject, pyqtSignal
-from danmuku import Danmuku
-from db import user_db
+from .danmuku import Danmuku
+from .db import user_db
+from . import utils
 
 class Launcher(QObject):
     onChangeWordCleared = pyqtSignal(str)

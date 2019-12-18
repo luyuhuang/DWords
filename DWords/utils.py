@@ -1,4 +1,10 @@
-from db import user_db
+import os
+from . import here
+
+def real_path(path):
+    return os.path.join(here, path)
+
+from .db import user_db
 
 COLORS = {
     'red': ("231,76,60", "255,255,255"),
@@ -75,3 +81,4 @@ def progress2value(key, progress):
 def value2progress(key, value):
     MIN, MAX = VALUE_RANGE[key]
     return int((value - MIN) / (MAX - MIN) * 99)
+

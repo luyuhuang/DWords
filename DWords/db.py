@@ -1,8 +1,10 @@
 import sqlite3
 import uuid
+import os
 from contextlib import contextmanager
-from version import VERSIONs
-from migrate import SQLs
+from .version import VERSIONs
+from .migrate import SQLs
+from .utils import real_path
 
 class DB:
     def __init__(self, database):
@@ -43,7 +45,12 @@ class DB:
     def close(self):
         self._conn.close()
 
-user_db = DB("data/user.db")
+data_dir = os.path.join(os.environ["HOME"], ".DWords")
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
+
+user_db = DB(os.path.join(data_dir, "user.db"))
+dictionary_db = DB(real_path("data/dictionary.db"))
 
 def initialize():
     if not user_db.getOne("select * from sqlite_master where type = 'table' and name = 'sys'"):

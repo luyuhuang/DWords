@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont, QMouseEvent
 from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal, QRect
-import utils
+from . import utils
 
 class WordLabel(QLabel):
     onEnter = pyqtSignal()

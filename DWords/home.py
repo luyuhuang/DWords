@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QBrush, QColor
 from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal
-from danmuku import Danmuku
-from db import user_db
+from .danmuku import Danmuku
+from .db import user_db
+from . import utils
+from .utils import real_path
 import random
-import utils
 
 class Home(QWidget):
     onClickBurst = pyqtSignal()
@@ -23,7 +24,7 @@ class Home(QWidget):
 
     def initUI(self):
         self.setWindowTitle("DWords")
-        self.setWindowIcon(QIcon("img/logo.svg"))
+        self.setWindowIcon(QIcon(real_path("img/logo.svg")))
         self.setMinimumWidth(400)
 
         body = QVBoxLayout()
@@ -31,7 +32,10 @@ class Home(QWidget):
 
         head = QHBoxLayout()
         icon = QLabel()
-        icon.setPixmap(QPixmap("img/logo.svg").scaled(50, 50, transformMode=Qt.SmoothTransformation))
+        icon.setPixmap(
+            QPixmap(real_path("img/logo.svg"))
+            .scaled(50, 50, transformMode=Qt.SmoothTransformation)
+        )
         head.addWidget(icon)
 
         title = QLabel("DWords")

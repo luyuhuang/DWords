@@ -1,6 +1,6 @@
 SQLs = {}
 
-SQLs['0.1'] = """
+SQLs['0.1.0'] = """
 create table words (
     id integer primary key autoincrement,
     word varchar(128) not null unique,

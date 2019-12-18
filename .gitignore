@@ -2,3 +2,6 @@ __pycache__/
 .vscode/
 data/user.db
 *.pyc
+build/
+dist/
+*.egg-info/

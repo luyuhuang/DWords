@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtCore import pyqtSignal, Qt
-from version import VERSION
-import utils
+from .version import VERSION
+from . import utils
+from .utils import real_path
 
 class Setting(QDialog):
     onClose = pyqtSignal()
@@ -16,7 +17,7 @@ class Setting(QDialog):
 
     def initUI(self):
         self.setWindowTitle("DWords - Setting")
-        self.setWindowIcon(QIcon("img/logo.svg"))
+        self.setWindowIcon(QIcon(real_path("img/logo.svg")))
         self.setMinimumWidth(330)
 
         body = QVBoxLayout()
@@ -179,7 +180,10 @@ class Setting(QDialog):
             layout.addLayout(line)
 
         label_icon = QLabel()
-        label_icon.setPixmap(QPixmap("img/logo.svg").scaled(60, 60, transformMode=Qt.SmoothTransformation))
+        label_icon.setPixmap(
+            QPixmap(real_path("img/logo.svg"))
+            .scaled(60, 60, transformMode=Qt.SmoothTransformation)
+        )
         add_line(label_icon)
 
         label_title = QLabel("DWords")
