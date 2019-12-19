@@ -52,7 +52,7 @@ class App(QApplication):
             self._setting.activateWindow()
         else:
             self._setting = Setting()
-            self._setting.onClose.connect(self.onSettingClose)
+            self._setting.destroyed.connect(self.onSettingClose)
 
     def onSettingClose(self):
         self._setting = None

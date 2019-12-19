@@ -31,7 +31,6 @@ class WordLabel(QLabel):
         self.onMouseRelease.emit(e)
 
 class Danmuku(QWidget):
-    onClose = pyqtSignal()
     onModified = pyqtSignal(str)
 
     def __init__(self, word, paraphrase, y, show_paraphrase = None, color = None):
@@ -57,7 +56,7 @@ class Danmuku(QWidget):
             Qt.X11BypassWindowManagerHint  # for gnome
         )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setAttribute(Qt.WA_QuitOnClose)
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.initUI()
         self.initPosition(y)
@@ -235,6 +234,7 @@ class Danmuku(QWidget):
             else:
                 self._stop_move = False
                 self._continenter.hide()
+                self.adjustSize()
 
     def initPosition(self, y):
         self._timer = QTimer(self)
@@ -252,7 +252,3 @@ class Danmuku(QWidget):
         if x < -self.width():
             self._timer.stop()
             self.close()
-
-    def closeEvent(self, e):
-        self.onClose.emit()
-

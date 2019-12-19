@@ -1,6 +1,14 @@
-<p align="center"><img src="img/logo.svg" alt="logo" width="100"></p>
+<p align="center"><img src="logo.svg" alt="logo" width="100"></p>
 <h1 align="center">DWords</h1>
 <p align="center">把单词变成屏幕上的弹幕来帮助你记住单词</p>
+
+[![PyPI version](https://img.shields.io/pypi/v/DWords.svg)](https://pypi.org/project/DWords/)
+[![Build Status](https://api.travis-ci.org/luyuhuang/DWords.svg?branch=dev)](https://travis-ci.org/luyuhuang/DWords)
+[![License](https://img.shields.io/github/license/luyuhuang/DWords)](https://github.com/luyuhuang/DWords/blob/dev/LICENSE)
+
+> 注意: 这个仓库还在开发中, 暂时没有稳定版本.
+
+![Screenshot](screenshot.png)
 
 ## 介绍
 
@@ -15,4 +23,28 @@ DWords 是一个跨平台工具, 它可以把单词变成弹幕显示在屏幕�
 
 ## 安装
 
-正在开发中...
+DWords 使用 Python3 编写, 我们推荐通过 pip 安装. 先确保你的电脑上已安装好了 Python3.
+
+打开终端运行以下命令, DWords 就安装好了:
+
+```sh
+pip3 install DWords
+```
+
+你也可以通过源码安装:
+
+```sh
+git clone https://github.com/luyuhuang/DWords.git
+cd DWords
+python3 setup.py install
+```
+
+<!-- 如果你不会 Python, 我们也提供了 Windows 系统的二进制版本. 点击[这里]()下载. 注意, 二进制版本可能不被杀毒软件信任. -->
+
+## 使用方法
+
+在终端键入 `DWords` 以启动 DWords. 如果你是下载的二进制版本, 双击 `DWords.exe` 启动.
+
+## 许可证
+
+DWords 在 [GPLv3 许可](https://github.com/luyuhuang/DWords/blob/dev/LICENSE)下发布, 因为 PyQt5 是在 GPLv3 下发布的 (所以我们别无选择). 你可以免费使用, 自由修改, 但是当你修改它时你必须使用同样的许可证开源.
