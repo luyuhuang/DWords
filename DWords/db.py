@@ -4,7 +4,7 @@ import os
 from contextlib import contextmanager
 from .version import VERSIONs
 from .migrate import SQLs
-from .utils import real_path
+from . import real_path
 
 class DB:
     def __init__(self, database):

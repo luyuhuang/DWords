@@ -1,6 +1,5 @@
 from .version import VERSION as __version__
 
-import os
-
-here = os.path.dirname(__file__)
-del os
+def real_path(path):
+    import os
+    return os.path.join(os.path.dirname(__file__), path)

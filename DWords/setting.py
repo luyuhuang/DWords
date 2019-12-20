@@ -2,8 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtCore import Qt
 from .version import VERSION
-from . import utils
-from .utils import real_path
+from . import utils, real_path
 
 class Setting(QDialog):
 

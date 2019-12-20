@@ -5,7 +5,7 @@ from .home import Home
 from .launcher import Launcher
 from .setting import Setting
 from .db import user_db, initialize
-from .utils import real_path
+from . import real_path
 
 class App(QApplication):
     def __init__(self, argv):

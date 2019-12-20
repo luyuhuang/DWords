@@ -3,8 +3,7 @@ from PyQt5.QtGui import QIcon, QFont, QPixmap, QBrush, QColor
 from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal
 from .danmuku import Danmuku
 from .db import user_db
-from . import utils
-from .utils import real_path
+from . import utils, real_path
 import random
 
 class Home(QWidget):

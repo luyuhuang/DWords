@@ -1,9 +1,4 @@
 import os
-from . import here
-
-def real_path(path):
-    return os.path.join(here, path)
-
 from .db import user_db
 
 COLORS = {
