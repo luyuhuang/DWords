@@ -1,6 +1,4 @@
 include *.in
 include *.md
 include *.txt
-include logo.svg
-include screenshot.png
 include LICENSE

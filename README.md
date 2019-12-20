@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.svg" alt="logo" width="100"></p>
 <h1 align="center">DWords</h1>
-<p align="center">Show words as Danmuku in the screen to helps you remember them.</p>
+<p align="center">Show words as Danmuku on the screen to helps you remember them.</p>
 
 [![PyPI Version](https://img.shields.io/pypi/v/DWords.svg)](https://pypi.org/project/DWords/)
 [![Build Status](https://api.travis-ci.org/luyuhuang/DWords.svg?branch=dev)](https://travis-ci.org/luyuhuang/DWords)
@@ -14,7 +14,7 @@
 
 ## Introduction
 
-DWords is a cross platform tool which show words as Danmuku in your screen to helps you remember them. The main purpose of DWords is to help non-English-speaking people study English, but not limited to English, you can also use it to remember anything you want.
+DWords is a cross platform tool which show words as Danmuku on your screen to helps you remember them. The main purpose of DWords is to help non-English-speaking people study English, but not limited to English, you can also use it to remember anything you want.
 
 Features:
 
