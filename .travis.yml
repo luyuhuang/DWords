@@ -2,10 +2,14 @@ language: python
 python:
   - "3.7"
   - "3.8"
+dist: xenial
+services:
+  - xvfb
 
 install:
   - pip install -r requirements.txt
+  - pip install pytest-qt
 
 script:
-  - python setup.py test
+  - xvfb-run pytest
   - python setup.py sdist

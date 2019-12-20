@@ -240,7 +240,7 @@ class Danmuku(QWidget):
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.update)
         speed = utils.get_setting("danmuku_speed")
-        self._timer.start(1 / speed)
+        self._timer.start(int(1 / speed))
 
         w = QDesktopWidget().availableGeometry().width()
         self.move(w, y)
