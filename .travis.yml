@@ -11,5 +11,5 @@ install:
   - pip install pytest-qt
 
 script:
-  - xvfb-run pytest
+  - xvfb-run -a pytest
   - python setup.py sdist
