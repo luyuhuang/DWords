@@ -1,4 +1,5 @@
 import os
+import time
 from .db import user_db
 
 COLORS = {
@@ -13,18 +14,6 @@ COLORS = {
     'white': ("236,240,241", "0,0,0"),
 }
 
-def clear_words(*words):
-    with user_db.cursor() as c:
-        c.execute(f"update words set cleared = 1 where word in ({','.join('?' * len(words))})", words)
-
-def redo_words(*words):
-    with user_db.cursor() as c:
-        c.execute(f"update words set cleared = 0 where word in ({','.join('?' * len(words))})", words)
-
-def delete_words(*words):
-    with user_db.cursor() as c:
-        c.execute(f"delete from words where word in ({','.join('?' * len(words))})", words)
-
 def random_one_word(*exceptions):
     return user_db.getOne("select word, paraphrase, show_paraphrase, color "
         "from words where cleared = 0 and "
@@ -33,10 +22,23 @@ def random_one_word(*exceptions):
     )
 
 def add_words(*words):
+    now = int(time.time() * 1000)
     with user_db.cursor() as c:
         for word, paraphrase in words:
             c.execute("update words set paraphrase = ? where word = ?", (paraphrase, word))
-            c.execute("insert or ignore into words(word, paraphrase) values(?, ?)", (word, paraphrase))
+            c.execute(
+                "insert or ignore into words(word, paraphrase, time) "
+                "values(?, ?, ?)", (word, paraphrase, now)
+            )
+
+def delete_words(*words):
+    with user_db.cursor() as c:
+        c.execute(f"delete from words where word in ({','.join('?' * len(words))})", words)
+
+def set_word_attribute(word, **kw):
+    with user_db.cursor() as c:
+        for k, v in kw.items():
+            c.execute(f"update words set {k} = ? where word = ?", (v, word))
 
 DEFAULT_SETTING = {
     "email": None,

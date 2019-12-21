@@ -185,7 +185,7 @@ class Home(QWidget):
         if self._list_order == "A-Z":
             order_by = "order by word"
         elif self._list_order == "Time":
-            order_by = "order by id desc"
+            order_by = "order by time desc, word"
 
         self._curr_words.clear()
         for word, paraphrase in user_db.getAll("select word, paraphrase from words where cleared = 0 " + order_by):
@@ -249,10 +249,10 @@ class Home(QWidget):
         if act == "Edit":
             self.showEditor(word, paraphrase)
         elif act == "Clear":
-            utils.clear_words(word)
+            utils.set_word_attribute(word, cleared=True)
             refresh = True
         elif act == "Redo":
-            utils.redo_words(word)
+            utils.set_word_attribute(word, cleared=False)
             refresh = True
         elif act == "Delete":
             reply = QMessageBox.question(

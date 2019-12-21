@@ -29,6 +29,7 @@ class DB:
 
     @contextmanager
     def cursor(self):
+        assert not self._in_cursor, "Cannot nest open cursor"
         try:
             self._in_cursor = True
             cursor = self._conn.cursor()

@@ -42,11 +42,7 @@ class Launcher(QObject):
 
     def modifyWord(self, attr):
         danmu = self.sender()
-        with user_db.cursor() as c:
-            c.execute(
-                f"update words set {attr} = ? where word = ?",
-                (getattr(danmu, attr), danmu._word)
-            )
+        utils.set_word_attribute(danmu._word, **{attr: getattr(danmu, attr)})
 
         if attr == "cleared":
             self.onChangeWordCleared.emit(danmu._word)
