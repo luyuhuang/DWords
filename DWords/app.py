@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QMessageBox
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import QCoreApplication
 from .home import Home
 from .launcher import Launcher
+from .synchronizer import Synchronizer
 from .setting import Setting
 from .db import user_db, initialize
 from . import real_path
@@ -12,12 +13,15 @@ class App(QApplication):
         super().__init__(argv)
         initialize()
         self._launcher = Launcher()
+        self._synchronizer = Synchronizer()
         self._home = Home()
         self._setting = None
 
         self._home.onClickBurst.connect(self.clickBurst)
         self._home.onClickSetting.connect(self.clickSetting)
+        self._home.onClickSync.connect(self.clickSync)
         self._launcher.onChangeWordCleared.connect(self._home.initLists)
+        self._synchronizer.onSynchronizeDone.connect(self._home.initLists)
 
         self.setQuitOnLastWindowClosed(False)
         self.setTrayIcon()
@@ -44,7 +48,10 @@ class App(QApplication):
         self._launcher.burst()
 
     def clickSync(self):
-        pass
+        # try:
+        self._synchronizer.sync()
+        # except Exception as e:
+        #     QMessageBox.critical(self._home, "Error", str(e), QMessageBox.Yes)
 
     def clickSetting(self):
         if self._setting:

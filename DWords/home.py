@@ -9,6 +9,7 @@ import random
 class Home(QWidget):
     onClickBurst = pyqtSignal()
     onClickSetting = pyqtSignal()
+    onClickSync = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -94,6 +95,7 @@ class Home(QWidget):
         setting = QPushButton("Setting")
         setting.clicked.connect(self.clickSetting)
         sync = QPushButton("Sync")
+        sync.clicked.connect(self.clickSync)
 
         btns = QHBoxLayout()
         btns.addStretch(1)
@@ -168,6 +170,9 @@ class Home(QWidget):
 
     def clickSetting(self):
         self.onClickSetting.emit()
+
+    def clickSync(self):
+        self.onClickSync.emit()
 
     def initLists(self):
         def create_item(word, paraphrase, cleared):

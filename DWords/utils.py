@@ -21,24 +21,40 @@ def random_one_word(*exceptions):
         "order by random() limit 1", exceptions
     )
 
+def clock():
+    return int(time.time() * 1000)
+
+def _on_modify(c, word, op):
+    now = clock()
+    c.execute("update sync_cache set op = ?, time = ? "
+        "where word = ?", (op, now, word))
+    c.execute("insert or ignore into sync_cache(word, op, time) "
+        "values(?, ?, ?)", (word, op, now))
+
 def add_words(*words):
-    now = int(time.time() * 1000)
+    now = clock()
     with user_db.cursor() as c:
         for word, paraphrase in words:
-            c.execute("update words set paraphrase = ? where word = ?", (paraphrase, word))
-            c.execute(
-                "insert or ignore into words(word, paraphrase, time) "
-                "values(?, ?, ?)", (word, paraphrase, now)
-            )
+            c.execute("update words set paraphrase = ?, modify_time = ? "
+                "where word = ?", (paraphrase, now, word))
+            c.execute("insert or ignore into words(word, paraphrase) "
+                "values(?, ?)", (word, paraphrase))
+            _on_modify(c, word, "add")
 
 def delete_words(*words):
     with user_db.cursor() as c:
         c.execute(f"delete from words where word in ({','.join('?' * len(words))})", words)
+        for word in words:
+            _on_modify(c, word, "del")
 
 def set_word_attribute(word, **kw):
     with user_db.cursor() as c:
         for k, v in kw.items():
             c.execute(f"update words set {k} = ? where word = ?", (v, word))
+
+        now = clock()
+        c.execute("update words set modify_time = ? where word = ?", (now, word))
+        _on_modify(c, word, "add")
 
 DEFAULT_SETTING = {
     "email": None,

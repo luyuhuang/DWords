@@ -57,21 +57,25 @@ class Setting(QDialog):
         widget.setLayout(layout)
 
         label_email = QLabel("Email: ")
-        edit_email = QLineEdit()
-        self._edit_email = edit_email
+        edit_email = QLineEdit(utils.get_setting("email"))
+        edit_email.key = "email"
+        edit_email.textChanged.connect(self.accountSettingChanged)
 
         label_password = QLabel("Password: ")
-        edit_password = QLineEdit()
+        edit_password = QLineEdit(utils.get_setting("password"))
+        edit_password.key = "password"
         edit_password.setEchoMode(QLineEdit.Password)
-        self._edit_password = edit_password
+        edit_password.textChanged.connect(self.accountSettingChanged)
 
         label_smtp = QLabel("SMTP server: ")
-        edit_smtp = QLineEdit()
-        self._edit_smtp = edit_smtp
+        edit_smtp = QLineEdit(utils.get_setting("smtp_server"))
+        edit_smtp.key = "smtp_server"
+        edit_smtp.textChanged.connect(self.accountSettingChanged)
 
         label_pop3 = QLabel("POP3 server: ")
-        edit_pop3 = QLineEdit()
-        self._edit_pop3 = edit_pop3
+        edit_pop3 = QLineEdit(utils.get_setting("pop3_server"))
+        edit_pop3.key = "pop3_server"
+        edit_pop3.textChanged.connect(self.accountSettingChanged)
 
         layout.addWidget(label_email)
         layout.addWidget(edit_email)
@@ -81,6 +85,9 @@ class Setting(QDialog):
         layout.addWidget(edit_smtp)
         layout.addWidget(label_pop3)
         layout.addWidget(edit_pop3)
+
+    def accountSettingChanged(self, value):
+        self._data[self.sender().key] = value
 
     def initDanmukuSetting(self):
         widget = self._danmuku_setting

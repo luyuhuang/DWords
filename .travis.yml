@@ -12,7 +12,7 @@ before_install:
 
 install:
   - pip install -r requirements.txt
-  - pip install pytest-qt
+  - pip install pytest-qt pytest-cov
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX +render -noreset"
   - sleep 3
@@ -22,5 +22,9 @@ before_script:
   - sleep 1
 
 script:
-  - pytest
+  - pytest --cov=DWords tests/
   - python setup.py sdist
+
+after_success:
+  - pip install codecov
+  - codecov

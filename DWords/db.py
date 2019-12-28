@@ -46,7 +46,11 @@ class DB:
     def close(self):
         self._conn.close()
 
-data_dir = os.path.join(os.environ["HOME"], ".DWords")
+if os.name == "nt":
+    data_dir = os.path.join(os.environ["USERPROFILE"], ".DWords")
+else:
+    data_dir = os.path.join(os.environ["HOME"], ".DWords")
+
 if not os.path.exists(data_dir):
     os.makedirs(data_dir)
 
