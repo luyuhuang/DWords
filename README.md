@@ -4,6 +4,7 @@
 
 [![PyPI Version](https://img.shields.io/pypi/v/DWords.svg)](https://pypi.org/project/DWords/)
 [![Build Status](https://api.travis-ci.org/luyuhuang/DWords.svg?branch=dev)](https://travis-ci.org/luyuhuang/DWords)
+[![codecov](https://codecov.io/gh/luyuhuang/DWords/branch/dev/graph/badge.svg)](https://codecov.io/gh/luyuhuang/DWords)
 [![License](https://img.shields.io/github/license/luyuhuang/DWords)](https://github.com/luyuhuang/DWords/blob/dev/LICENSE)
 
 > Notice: this repository is under development, no stable release at the moment.

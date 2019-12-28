@@ -1,1 +1,3 @@
-PyQt5==5.13.2
+html_text==0.5.1
+PyQt5==5.14.0
+python_dateutil==2.8.1
