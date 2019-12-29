@@ -6,6 +6,7 @@ from .launcher import Launcher
 from .synchronizer import Synchronizer
 from .setting import Setting
 from .db import user_db, initialize
+from .async_thread import normal
 from . import real_path
 
 class App(QApplication):
@@ -47,11 +48,19 @@ class App(QApplication):
     def clickBurst(self):
         self._launcher.burst()
 
-    def clickSync(self):
-        # try:
-        self._synchronizer.sync()
-        # except Exception as e:
-        #     QMessageBox.critical(self._home, "Error", str(e), QMessageBox.Yes)
+    @normal
+    async def clickSync(self):
+        if self._synchronizer._synchronizing: return
+        try:
+            res = await self._synchronizer.sync()
+        except Exception as e:
+            QMessageBox.critical(self._home, "Error", str(e), QMessageBox.Yes)
+            print("FAILED----", e)
+        else:
+            print("SUCCEED----", res)
+        finally:
+            self._home.sync_btn.setEnabled(True)
+            self._home.sync_btn.setText("Sync")
 
     def clickSetting(self):
         if self._setting:

@@ -10,53 +10,58 @@ class Synchronizer(QObject):
     def __init__(self):
         super().__init__()
         self.UUID, = user_db.getOne("select value from sys where id = 'uuid'")
-        self._mail = None
+        self._mail = Mail()
+        self._synchronizing = False
 
-    def get_mail(self):
-        if self._mail is None:
-            self._mail = Mail()
+    async def _sync(self):
+        async with self.connect():
+            cache = user_db.getAll("select word, op, time from sync_cache")
+            words = {}
+            for word, op, time in cache:
+                if op == "add":
+                    values = user_db.getOne(f"select {','.join(self.FIELDS)} from words "
+                        "where word = ?", (word,))
 
-        return self._mail
+                    data = dict(zip(self.FIELDS, values))
+                    words[word] = ("add", time, data)
+                elif op == "del":
+                    words[word] = ("del", time, None)
 
-    def close_mail(self):
-        if self._mail:
-            self._mail.close()
-        self._mail = None
+            await self.publish(words)
 
-    def sync(self):
-        cache = user_db.getAll("select word, op, time from sync_cache")
-        words = {}
-        for word, op, time in cache:
-            if op == "add":
-                values = user_db.getOne(f"select {','.join(self.FIELDS)} from words "
-                    "where word = ?", (word,))
+            with user_db.cursor() as c:
+                c.execute("delete from sync_cache")
 
-                data = dict(zip(self.FIELDS, values))
-                words[word] = ("add", time, data)
-            elif op == "del":
-                words[word] = ("del", time, None)
+            words = await self.collect()
 
-        self.publish(words)
+            for word, (op, time, data) in words.items():
+                modify_time = user_db.getOne("select modify_time from words where word = ?", (word,))
+                if not modify_time or time > modify_time[0]:
+                    self.accept(word, op, time, data)
 
-        with user_db.cursor() as c:
-            c.execute("delete from sync_cache")
+            self.onSynchronizeDone.emit()
+            print("Synchronize done")
 
-        for word, (op, time, data) in self.collect().items():
-            modify_time = user_db.getOne("select modify_time from words where word = ?", (word,))
-            if not modify_time or time > modify_time[0]:
-                self.accept(word, op, time, data)
+    async def sync(self):
+        assert not self._synchronizing, "Synchronizing"
+        self._synchronizing = True
 
-        print("Synchronize done")
-        self.onSynchronizeDone.emit()
+        try:
+            await self._sync()
+        finally:
+            self._synchronizing = False
 
-    def publish(self, words):
+    def connect(self):
+        return self._mail.connect()
+
+    async def publish(self, words):
         if not words: return
-        self.get_mail().push(self.UUID, words)
+        await self._mail.push(self.UUID, words)
 
-    def collect(self):
+    async def collect(self):
         word_time_map = {}
         ans = {}
-        for words in self.get_mail().pull(self.UUID + "a"):
+        async for words in self._mail.pull(self.UUID):
             for word, (op, time, data) in words.items():
                 if time > word_time_map.get(word, 0):
                     word_time_map[word] = time

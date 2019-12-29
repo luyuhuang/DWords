@@ -12,27 +12,42 @@ from email.parser import Parser, FeedParser
 from dateutil.parser import parse as parse_timestr
 from . import utils
 from .db import user_db
+from .async_thread import RunInThread
 
 class Mail:
     def __init__(self):
-        smtp_server = utils.get_setting("smtp_server")
-        pop3_server = utils.get_setting("pop3_server")
-        email = utils.get_setting("email")
-        password = utils.get_setting("password")
+        pass
 
-        if None in (smtp_server, pop3_server, email, password):
+    async def __aenter__(self):
+        print("Connecting...")
+        await RunInThread(self._connect)
+
+    async def __aexit__(self, type, value, tb):
+        print("Connected")
+        self._smtp.quit()
+        self._pop3.quit()
+        del self._smtp
+        del self._pop3
+
+    def _connect(self):
+        self._smtp = smtplib.SMTP_SSL(self._smtp_server, smtplib.SMTP_SSL_PORT)
+        self._smtp.login(self._email, self._password)
+        self._pop3 = poplib.POP3_SSL(self._pop3_server, poplib.POP3_SSL_PORT)
+        self._pop3.user(self._email)
+        self._pop3.pass_(self._password)
+
+    def connect(self):
+        self._smtp_server = utils.get_setting("smtp_server")
+        self._pop3_server = utils.get_setting("pop3_server")
+        self._email = utils.get_setting("email")
+        self._password = utils.get_setting("password")
+
+        if None in (self._smtp_server, self._pop3_server, self._email, self._password):
             raise Exception("Incomplete email setting")
 
-        self._smtp = smtplib.SMTP_SSL(smtp_server, smtplib.SMTP_SSL_PORT)
-        self._smtp.login(email, password)
+        return self
 
-        self._pop3 = poplib.POP3_SSL(pop3_server, poplib.POP3_SSL_PORT)
-        self._pop3.user(email)
-        self._pop3.pass_(password)
-
-        self._email = email
-
-    def push(self, uuid, words):
+    def _push(self, uuid, words):
         subject = "DWords synchronize"
         content = json.dumps(words)
 
@@ -42,6 +57,9 @@ class Mail:
         msg["To"] = self._email
 
         self._smtp.sendmail(self._email, [self._email], msg.as_string())
+
+    async def push(self, uuid, words):
+        await RunInThread(self._push, uuid, words)
 
     def _decode_str(self, s):
         value, charset = decode_header(s)[0]
@@ -92,14 +110,20 @@ class Mail:
 
             return extract_text(content)
 
-    def pull(self, uuid):
-        count, _ = self._pop3.stat()
+    def _pop3_stat(self):
+        return self._pop3.stat()
+
+    def _pop3_retr(self, i):
+        return self._pop3.retr(i)
+
+    async def pull(self, uuid):
+        count, _ = await RunInThread(self._pop3_stat)
         last_id = user_db.getOne("select value from sys where id = 'last_mail_id'")
         if last_id:
             last_id, = last_id
 
         for i in range(count, max(1, count - 50), -1):
-            _, lines, _ = self._pop3.retr(i)
+            _, lines, _ = await RunInThread(self._pop3_retr, i)
             msg = Parser(policy=policy.default).parsestr(b"\n".join(lines).decode("utf-8"))
 
             msg_id = msg.get("Message-Id")
@@ -133,9 +157,9 @@ class Mail:
                 for line in content.splitlines():
                     line = line.strip()
                     if not line: continue
-                    if line.startswith("~~~"):
+                    if line.startswith("~~~") or line.startswith("..."):
                         break
-                    elif line.startswith("---"):
+                    elif line.startswith("---") or line.startswith(",,,"):
                         if word:
                             words[word] = ("add", time, {"paraphrase": "\n".join(paraphrase)})
                         word, paraphrase = "", []
@@ -148,7 +172,3 @@ class Mail:
                     words[word] = ("add", time, {"paraphrase": "\n".join(paraphrase)})
 
                 yield words
-
-    def close(self):
-        self._smtp.quit()
-        self._pop3.quit()

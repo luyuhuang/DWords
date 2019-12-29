@@ -96,6 +96,7 @@ class Home(QWidget):
         setting.clicked.connect(self.clickSetting)
         sync = QPushButton("Sync")
         sync.clicked.connect(self.clickSync)
+        self.sync_btn = sync
 
         btns = QHBoxLayout()
         btns.addStretch(1)
@@ -172,6 +173,8 @@ class Home(QWidget):
         self.onClickSetting.emit()
 
     def clickSync(self):
+        self.sync_btn.setText("Syncing...")
+        self.sync_btn.setEnabled(False)
         self.onClickSync.emit()
 
     def initLists(self):
