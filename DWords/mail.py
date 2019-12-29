@@ -31,6 +31,8 @@ class Mail:
 
     def _connect(self):
         self._smtp = smtplib.SMTP_SSL(self._smtp_server, smtplib.SMTP_SSL_PORT)
+        self._smtp.helo(self._smtp_server)
+        self._smtp.ehlo(self._smtp_server)
         self._smtp.login(self._email, self._password)
         self._pop3 = poplib.POP3_SSL(self._pop3_server, poplib.POP3_SSL_PORT)
         self._pop3.user(self._email)
