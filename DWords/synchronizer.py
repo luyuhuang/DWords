@@ -12,6 +12,8 @@ class Synchronizer(QObject):
         self.UUID, = user_db.getOne("select value from sys where id = 'uuid'")
         self._mail = Mail()
         self._synchronizing = False
+        self._add_count = 0
+        self._del_count = 0
 
     async def _sync(self):
         async with self.connect():
@@ -40,7 +42,7 @@ class Synchronizer(QObject):
                     self.accept(word, op, time, data)
 
             self.onSynchronizeDone.emit()
-            print("Synchronize done")
+            print(f"Synchronize done. Add {self._add_count} word(s) and delete {self._del_count} word(s)")
 
     async def sync(self):
         assert not self._synchronizing, "Synchronizing"
@@ -50,6 +52,7 @@ class Synchronizer(QObject):
             await self._sync()
         finally:
             self._synchronizing = False
+            self._add_count, self._del_count = 0, 0
 
     def connect(self):
         return self._mail.connect()
@@ -83,6 +86,10 @@ class Synchronizer(QObject):
                     " values(?,?," + ",".join("?" * len(keys)) + ")"
                 c.execute(sql, (word, time) + values)
 
+                self._add_count += 1
+
         elif op == "del":
             with user_db.cursor() as c:
                 c.execute("delete from words where word = ?", word)
+
+                self._del_count += 1

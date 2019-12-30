@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QThread, QObject, pyqtSignal
 
+_coroutines = {}
+
 class Work(QThread):
-    workSucceed = pyqtSignal(object)
-    workFailed = pyqtSignal(Exception)
 
     def __init__(self, f, args, kw):
         super().__init__()
@@ -14,9 +14,11 @@ class Work(QThread):
         try:
             res = self._f(*self._args, *self._kw)
         except Exception as e:
-            self.workFailed.emit(e)
+            self.succeed = False
+            self.value = e
         else:
-            self.workSucceed.emit(res)
+            self.succeed = True
+            self.value = res
 
 class RunInThread(QObject):
 
@@ -25,25 +27,22 @@ class RunInThread(QObject):
         self._thread = Work(f, args, kw)
 
     def __await__(self):
+        self._thread.finished.connect(self.onWorkFinished)
         self._thread.start()
-        self._thread.workSucceed.connect(self.onSucceed)
-        self._thread.workFailed.connect(self.onFailed)
         res = yield self
         return res
 
-    def onSucceed(self, res):
+    def onWorkFinished(self):
+        assert self._thread.isFinished()
         try:
-            o = self.co.send(res)
+            if self._thread.succeed:
+                o = self.co.send(self._thread.value)
+            else:
+                o = self.co.throw(self._thread.value)
             o.co = self.co
+            _coroutines[self.co] = o
         except StopIteration:
-            pass
-
-    def onFailed(self, err):
-        try:
-            o = self.co.throw(err)
-            o.co = self.co
-        except StopIteration:
-            pass
+            del _coroutines[self.co]
 
 def normal(f):
     def wrapper(*args, **kw):
@@ -51,6 +50,7 @@ def normal(f):
         try:
             o = co.send(None)
             o.co = co
+            _coroutines[co] = o
         except StopIteration:
             pass
 

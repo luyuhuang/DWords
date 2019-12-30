@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QMessageBox
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, QTimer
 from .home import Home
 from .launcher import Launcher
 from .synchronizer import Synchronizer
 from .setting import Setting
 from .db import user_db, initialize
 from .async_thread import normal
-from . import real_path
+from . import utils, real_path
 
 class App(QApplication):
     def __init__(self, argv):
@@ -23,6 +23,11 @@ class App(QApplication):
         self._home.onClickSync.connect(self.clickSync)
         self._launcher.onChangeWordCleared.connect(self._home.initLists)
         self._synchronizer.onSynchronizeDone.connect(self._home.initLists)
+
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self.autoSync)
+        self._timer.start(10 * 60 * 1000)
+        self.autoSync()
 
         self.setQuitOnLastWindowClosed(False)
         self.setTrayIcon()
@@ -48,13 +53,20 @@ class App(QApplication):
     def clickBurst(self):
         self._launcher.burst()
 
+    def autoSync(self):
+        if not utils.is_sync(): return
+        self.clickSync()
+
     @normal
-    async def clickSync(self):
+    async def clickSync(self, *_):
         if self._synchronizer._synchronizing: return
+        self._home.sync_btn.setEnabled(False)
+        self._home.sync_btn.setText("Syncing...")
+
         try:
             res = await self._synchronizer.sync()
         except Exception as e:
-            QMessageBox.critical(self._home, "Error", str(e), QMessageBox.Yes)
+            QMessageBox.critical(self._home, "Sync Error", str(e), QMessageBox.Yes)
             print("FAILED----", e)
         else:
             print("SUCCEED----", res)

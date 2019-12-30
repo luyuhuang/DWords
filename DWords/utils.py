@@ -81,6 +81,13 @@ def set_setting(key, value):
         c.execute("update setting set value = ? where key = ?", (value, key))
         c.execute("insert or ignore into setting(key, value) values(?, ?)", (key, value))
 
+def is_sync():
+    count, = user_db.getOne("select count(key) from setting "
+        "where key in ('email', 'password', 'smtp_server', 'pop3_server') "
+        "and value != 'None'")
+
+    return count == 4
+
 VALUE_RANGE = {
     "danmuku_speed": (1 / 9, 1 / 18),
     "danmuku_frequency": (3000, 20000),

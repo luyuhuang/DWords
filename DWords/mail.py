@@ -21,13 +21,14 @@ class Mail:
     async def __aenter__(self):
         print("Connecting...")
         await RunInThread(self._connect)
+        print("Connected")
 
     async def __aexit__(self, type, value, tb):
-        print("Connected")
         self._smtp.quit()
         self._pop3.quit()
         del self._smtp
         del self._pop3
+        print("Disconnected")
 
     def _connect(self):
         self._smtp = smtplib.SMTP_SSL(self._smtp_server, smtplib.SMTP_SSL_PORT)
@@ -61,7 +62,9 @@ class Mail:
         self._smtp.sendmail(self._email, [self._email], msg.as_string())
 
     async def push(self, uuid, words):
+        print("Pushing...")
         await RunInThread(self._push, uuid, words)
+        print("Pushed")
 
     def _decode_str(self, s):
         value, charset = decode_header(s)[0]
@@ -119,16 +122,24 @@ class Mail:
         return self._pop3.retr(i)
 
     async def pull(self, uuid):
+        print("Getting mail count...")
         count, _ = await RunInThread(self._pop3_stat)
+        print("Mail count:", count)
         last_id = user_db.getOne("select value from sys where id = 'last_mail_id'")
         if last_id:
             last_id, = last_id
 
+        get_count, read_count = 0, 0
         for i in range(count, max(1, count - 50), -1):
+            print("Retrieving mail", i)
             _, lines, _ = await RunInThread(self._pop3_retr, i)
             msg = Parser(policy=policy.default).parsestr(b"\n".join(lines).decode("utf-8"))
 
             msg_id = msg.get("Message-Id")
+
+            print("Got mail:", msg_id)
+            get_count += 1
+
             if msg_id == last_id: break
             if i == count:
                 with user_db.cursor() as c:
@@ -174,3 +185,7 @@ class Mail:
                     words[word] = ("add", time, {"paraphrase": "\n".join(paraphrase)})
 
                 yield words
+
+            read_count += 1
+
+        print(f"Got {get_count} mail(s) and accept {read_count} mail(s)")
