@@ -1,3 +1,4 @@
+from functools import wraps
 from PyQt5.QtCore import QThread, QObject, pyqtSignal
 
 _coroutines = {}
@@ -45,6 +46,7 @@ class RunInThread(QObject):
             del _coroutines[self.co]
 
 def normal(f):
+    @wraps(f)
     def wrapper(*args, **kw):
         co = f(*args, **kw)
         try:
@@ -53,5 +55,12 @@ def normal(f):
             _coroutines[co] = o
         except StopIteration:
             pass
+
+    return wrapper
+
+def thread(f):
+    @wraps(f)
+    def wrapper(*args, **kw):
+        return RunInThread(f, *args, **kw)
 
     return wrapper

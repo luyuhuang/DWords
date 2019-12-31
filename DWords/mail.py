@@ -12,7 +12,7 @@ from email.parser import Parser, FeedParser
 from dateutil.parser import parse as parse_timestr
 from . import utils
 from .db import user_db
-from .async_thread import RunInThread
+from .async_thread import thread
 
 class Mail:
     def __init__(self):
@@ -20,7 +20,7 @@ class Mail:
 
     async def __aenter__(self):
         print("Connecting...")
-        await RunInThread(self._connect)
+        await self._connect()
         print("Connected")
 
     async def __aexit__(self, type, value, tb):
@@ -30,6 +30,7 @@ class Mail:
         del self._pop3
         print("Disconnected")
 
+    @thread
     def _connect(self):
         self._smtp = smtplib.SMTP_SSL(self._smtp_server, smtplib.SMTP_SSL_PORT)
         self._smtp.helo(self._smtp_server)
@@ -50,6 +51,7 @@ class Mail:
 
         return self
 
+    @thread
     def _push(self, uuid, words):
         subject = "DWords synchronize"
         content = json.dumps(words)
@@ -63,8 +65,8 @@ class Mail:
 
     async def push(self, uuid, words):
         print("Pushing...")
-        await RunInThread(self._push, uuid, words)
-        print("Pushed")
+        await self._push(uuid, words)
+        print(f"{len(words)} word(s) pushed")
 
     def _decode_str(self, s):
         value, charset = decode_header(s)[0]
@@ -115,15 +117,17 @@ class Mail:
 
             return extract_text(content)
 
+    @thread
     def _pop3_stat(self):
         return self._pop3.stat()
 
+    @thread
     def _pop3_retr(self, i):
         return self._pop3.retr(i)
 
     async def pull(self, uuid):
         print("Getting mail count...")
-        count, _ = await RunInThread(self._pop3_stat)
+        count, _ = await self._pop3_stat()
         print("Mail count:", count)
         last_id = user_db.getOne("select value from sys where id = 'last_mail_id'")
         if last_id:
@@ -132,7 +136,7 @@ class Mail:
         get_count, read_count = 0, 0
         for i in range(count, max(1, count - 50), -1):
             print("Retrieving mail", i)
-            _, lines, _ = await RunInThread(self._pop3_retr, i)
+            _, lines, _ = await self._pop3_retr(i)
             msg = Parser(policy=policy.default).parsestr(b"\n".join(lines).decode("utf-8"))
 
             msg_id = msg.get("Message-Id")
@@ -159,6 +163,7 @@ class Mail:
                     try:
                         words = json.loads(content)
                         yield words
+                        read_count += 1
                     except:
                         pass
 
@@ -185,7 +190,6 @@ class Mail:
                     words[word] = ("add", time, {"paraphrase": "\n".join(paraphrase)})
 
                 yield words
+                read_count += 1
 
-            read_count += 1
-
-        print(f"Got {get_count} mail(s) and accept {read_count} mail(s)")
+        print(f"Got {get_count} mail(s) and accepted {read_count} mail(s)")
