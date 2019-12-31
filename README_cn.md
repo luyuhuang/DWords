@@ -37,14 +37,54 @@ pip3 install DWords
 ```sh
 git clone https://github.com/luyuhuang/DWords.git
 cd DWords
+git checkout master
 python3 setup.py install
 ```
 
-<!-- 如果你不会 Python, 我们也提供了 Windows 系统的二进制版本. 点击[这里]()下载. 注意, 二进制版本可能不被杀毒软件信任. -->
+如果你不会 Python, 我们也提供了 Windows 系统的二进制版本. 点击[这里](https://github.com/luyuhuang/DWords/releases)下载. 注意, 二进制版本可能不被杀毒软件信任.
 
 ## 使用方法
 
 在终端键入 `DWords` 以启动 DWords. 如果你是下载的二进制版本, 双击 `DWords.exe` 启动.
+
+### 添加单词
+
+点击 "+" 按钮并在下方的输入框中输入单词. 格式如下: 第一行为单词, 第二行为简要释义, 接下来的是详细释义. 简要释义能够直接显示在弹幕上, 但详细释义只能显示在详细面板中. 详细释义是可选的. 比如:
+
+```
+word
+单词
+n. 单词;词;字; eg. Do not write more than 200 words.
+```
+
+然后点击 "Commit" 按钮添加它, 或者按下 Ctrl + Enter.
+
+### 同步
+
+DWords 支持在多个客户端之间同步单词. 为了启用这一功能, 你需要先设置账户. 点击 "Setting" 按钮在 "Account" 标签中设置邮箱地址, 邮箱密码, SMTP 服务器和 POP3 服务器. DWords 会通过发送邮件来同步数据, 所以推荐使用一个不常用的邮箱.
+
+### 通过邮件添加单词
+
+设置好了账户后, 你就可以通过发送邮件来添加单词. 随意使用一个邮件客户端编辑邮件, 主题为 "DWords add", 内容的格式与添加单词类似, 不过可以添加多个单词, 单词之间用三连杠 "---" 或者三逗号 ",,," 分割; 三波浪线 "~~~" 或者三点号 "..." 表示结束. 例如:
+
+```
+world
+世界
+---
+word
+单词
+,,,
+hello
+你好
+...
+在 ... 之后的内容都会被忽略
+```
+
+然后把这封邮件发送到你设置好的邮箱即可.
+
+## 贡献
+
+如果你遇到了任何问题, 或者有任何建议, 请提交 [issue](https://github.com/luyuhuang/DWords/issues). 我们也欢迎各种 pull request.
 
 ## 许可证
 
