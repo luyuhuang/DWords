@@ -1,6 +1,10 @@
 import os
 import time
+import logging
 from .db import user_db
+
+logging.basicConfig(format="[%(levelname)s] %(asctime)s | %(message)s",
+                    level=logging.INFO)
 
 COLORS = {
     'red': ("231,76,60", "255,255,255"),

@@ -1,3 +1,4 @@
+import logging
 from PyQt5.QtCore import QObject, pyqtSignal
 from . import utils
 from .mail import Mail
@@ -42,7 +43,7 @@ class Synchronizer(QObject):
                     self.accept(word, op, time, data)
 
             self.onSynchronizeDone.emit()
-            print(f"Synchronize done. Add {self._add_count} word(s) and delete {self._del_count} word(s)")
+            logging.info(f"Add {self._add_count} word(s) and delete {self._del_count} word(s)")
 
     async def sync(self):
         assert not self._synchronizing, "Synchronizing"

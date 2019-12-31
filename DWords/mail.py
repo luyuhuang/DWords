@@ -2,7 +2,7 @@ import json
 import poplib
 import smtplib
 import poplib
-import re
+import logging
 from html_text import extract_text
 from email import encoders, policy
 from email.header import Header, decode_header
@@ -19,16 +19,16 @@ class Mail:
         pass
 
     async def __aenter__(self):
-        print("Connecting...")
+        logging.debug("Connecting...")
         await self._connect()
-        print("Connected")
+        logging.debug("Connected")
 
     async def __aexit__(self, type, value, tb):
         self._smtp.quit()
         self._pop3.quit()
         del self._smtp
         del self._pop3
-        print("Disconnected")
+        logging.debug("Disconnected")
 
     @thread
     def _connect(self):
@@ -64,9 +64,9 @@ class Mail:
         self._smtp.sendmail(self._email, [self._email], msg.as_string())
 
     async def push(self, uuid, words):
-        print("Pushing...")
+        logging.debug("Pushing...")
         await self._push(uuid, words)
-        print(f"{len(words)} word(s) pushed")
+        logging.info(f"{len(words)} word(s) pushed")
 
     def _decode_str(self, s):
         value, charset = decode_header(s)[0]
@@ -126,22 +126,22 @@ class Mail:
         return self._pop3.retr(i)
 
     async def pull(self, uuid):
-        print("Getting mail count...")
+        logging.debug("Getting mail count...")
         count, _ = await self._pop3_stat()
-        print("Mail count:", count)
+        logging.debug(f"Mail count: {count}")
         last_id = user_db.getOne("select value from sys where id = 'last_mail_id'")
         if last_id:
             last_id, = last_id
 
         get_count, read_count = 0, 0
         for i in range(count, max(1, count - 50), -1):
-            print("Retrieving mail", i)
+            logging.debug(f"Retrieving mail {i}")
             _, lines, _ = await self._pop3_retr(i)
             msg = Parser(policy=policy.default).parsestr(b"\n".join(lines).decode("utf-8"))
 
             msg_id = msg.get("Message-Id")
 
-            print("Got mail:", msg_id)
+            logging.debug(f"Got mail: {msg_id}")
             get_count += 1
 
             if msg_id == last_id: break
@@ -192,4 +192,4 @@ class Mail:
                 yield words
                 read_count += 1
 
-        print(f"Got {get_count} mail(s) and accepted {read_count} mail(s)")
+        logging.debug(f"Got {get_count} mail(s) and accepted {read_count} mail(s)")

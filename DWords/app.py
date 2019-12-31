@@ -1,3 +1,4 @@
+import logging
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QMessageBox
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import QCoreApplication, QTimer
@@ -63,13 +64,14 @@ class App(QApplication):
         self._home.sync_btn.setEnabled(False)
         self._home.sync_btn.setText("Syncing...")
 
+        logging.info("Start synchronize")
         try:
-            res = await self._synchronizer.sync()
+            await self._synchronizer.sync()
         except Exception as e:
             QMessageBox.critical(self._home, "Sync Error", str(e), QMessageBox.Yes)
-            print("FAILED----", e)
+            logging.error(f"Synchronize failed: {e}")
         else:
-            print("SUCCEED----", res)
+            logging.info("Synchronize succeed.")
         finally:
             self._home.sync_btn.setEnabled(True)
             self._home.sync_btn.setText("Sync")
