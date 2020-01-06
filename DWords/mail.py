@@ -139,7 +139,11 @@ class Mail:
             _, lines, _ = await self._pop3_retr(i)
             msg = Parser(policy=policy.default).parsestr(b"\n".join(lines).decode("utf-8"))
 
-            msg_id = msg.get("Message-Id")
+            try:
+                msg_id = msg.get("Message-Id")
+            except Exception as e:
+                logging.warning(f"Error getting Message-Id. The mail[{i}] is ignored. Error message: {e}")
+                continue
 
             logging.debug(f"Got mail: {msg_id}")
             get_count += 1
