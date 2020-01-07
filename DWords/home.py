@@ -1,10 +1,36 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QPixmap, QBrush, QColor
+from PyQt5.QtGui import QIcon, QFont, QPixmap, QBrush, QColor, QKeyEvent, QTextCursor
 from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal
-from .danmuku import Danmuku
-from .db import user_db
+from .danmaku import Danmaku
+from .db import user_db, dictionary_db
 from . import utils, real_path
 import random
+
+class WordEditor(QTextEdit):
+    onCommitWord = pyqtSignal()
+
+    def keyPressEvent(self, e):
+        ignore = False
+        if e.key() == Qt.Key_Return:
+            if e.modifiers() == Qt.ControlModifier:
+                self.onCommitWord.emit()
+            else:
+                text = self.toPlainText()
+                if "\n" not in text:
+                    paraphrase = utils.consult(text)
+                    if paraphrase:
+                        self.setPlainText(text + "\n" + paraphrase)
+                        cursor = self.textCursor()
+                        start = cursor.position() + len(text) + 1
+                        end = len(self.toPlainText())
+                        cursor.setPosition(start, QTextCursor.MoveAnchor)
+                        cursor.setPosition(end, QTextCursor.KeepAnchor)
+                        self.setTextCursor(cursor)
+
+                        ignore = True
+
+        if not ignore:
+            super().keyPressEvent(e)
 
 class Home(QWidget):
     onClickBurst = pyqtSignal()
@@ -13,7 +39,6 @@ class Home(QWidget):
 
     def __init__(self):
         super().__init__()
-        self._danmus = set()
         self._closing = False
         self._is_hid_paraphrase = False
         self._list_order = 'Time'
@@ -115,8 +140,9 @@ class Home(QWidget):
         layout = QVBoxLayout()
         editor.setLayout(layout)
 
-        word_editor = QTextEdit()
+        word_editor = WordEditor()
         word_editor.setMinimumHeight(100)
+        word_editor.onCommitWord.connect(self.commitWord)
         layout.addWidget(word_editor)
         self._word_editor = word_editor
 
@@ -143,10 +169,6 @@ class Home(QWidget):
         self._editor.hide()
         self._word_editor.clear()
 
-    def keyPressEvent(self, e):
-        if e.modifiers() == Qt.ControlModifier and e.key() == Qt.Key_Return:
-            self.commitWord()
-
     def commitWord(self):
         text = self._word_editor.toPlainText()
         while True:
@@ -165,6 +187,7 @@ class Home(QWidget):
 
     def clickCloseEditor(self):
         self.hideEditor()
+        # self.adjustSize()
 
     def clickBurst(self):
         self.onClickBurst.emit()
@@ -221,6 +244,7 @@ class Home(QWidget):
             item.setToolTip(1, '')
 
     def doubleClickList(self, item):
+        if self._is_hid_paraphrase: return
         self.showEditor(item.text(0), item.paraphrase)
 
     def clickHideParaphrase(self, e):

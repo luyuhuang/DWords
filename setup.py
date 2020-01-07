@@ -15,11 +15,11 @@ with open(os.path.join(here, "requirements.txt")) as f:
 setup(
     name="DWords",
     version=VERSION,
-    description="Show words as Danmuku in the screen to helps you remember them.",
+    description="Show words as Danmaku in the screen to helps you remember them.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/luyuhuang/DWords",
-    keywords="danmuku words english-learning vocabulary pyqt5",
+    keywords="danmaku words english-learning vocabulary pyqt5",
     license="GPLv3",
     author="Luyu Huang",
     author_email="luyu_huang@foxmail.com",
@@ -27,7 +27,7 @@ setup(
     packages=find_packages(),
     install_requires=install_requires,
     package_data={
-        '': ['img/*', 'data/*']
+        '': ['img/*', 'data/*.db']
     },
     entry_points={
         "gui_scripts": ["DWords=DWords.__main__:main"]

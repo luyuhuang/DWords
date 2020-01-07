@@ -91,6 +91,6 @@ class Synchronizer(QObject):
 
         elif op == "del":
             with user_db.cursor() as c:
-                c.execute("delete from words where word = ?", word)
+                c.execute("delete from words where word = ?", (word,))
 
                 self._del_count += 1

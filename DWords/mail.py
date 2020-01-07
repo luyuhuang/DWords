@@ -32,11 +32,11 @@ class Mail:
 
     @thread
     def _connect(self):
-        self._smtp = smtplib.SMTP_SSL(self._smtp_server, smtplib.SMTP_SSL_PORT)
+        self._smtp = smtplib.SMTP_SSL(self._smtp_server, smtplib.SMTP_SSL_PORT, timeout=30)
         self._smtp.helo(self._smtp_server)
         self._smtp.ehlo(self._smtp_server)
         self._smtp.login(self._email, self._password)
-        self._pop3 = poplib.POP3_SSL(self._pop3_server, poplib.POP3_SSL_PORT)
+        self._pop3 = poplib.POP3_SSL(self._pop3_server, poplib.POP3_SSL_PORT, timeout=30)
         self._pop3.user(self._email)
         self._pop3.pass_(self._password)
 
@@ -175,6 +175,7 @@ class Mail:
                 time = int(parse_timestr(msg.get("Date")).timestamp() * 1000)
                 content = self._parse_content(msg)
                 word, paraphrase = "", []
+                tostr = lambda w, p: "\n".join(p) if p else utils.consult(w) or "<None>"
                 words = {}
                 for line in content.splitlines():
                     line = line.strip()
@@ -183,7 +184,7 @@ class Mail:
                         break
                     elif line.startswith("---") or line.startswith(",,,"):
                         if word:
-                            words[word] = ("add", time, {"paraphrase": "\n".join(paraphrase)})
+                            words[word] = ("add", time, {"paraphrase": tostr(word, paraphrase)})
                         word, paraphrase = "", []
                     else:
                         if not word:
@@ -191,7 +192,7 @@ class Mail:
                         else:
                             paraphrase.append(line)
                 if word:
-                    words[word] = ("add", time, {"paraphrase": "\n".join(paraphrase)})
+                    words[word] = ("add", time, {"paraphrase": tostr(word, paraphrase)})
 
                 yield words
                 read_count += 1

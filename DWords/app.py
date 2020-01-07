@@ -27,7 +27,7 @@ class App(QApplication):
 
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.autoSync)
-        self._timer.start(10 * 60 * 1000)
+        self._timer.start(utils.get_setting("sync_frequency"))
         self.autoSync()
 
         self.setQuitOnLastWindowClosed(False)
@@ -56,10 +56,11 @@ class App(QApplication):
 
     def autoSync(self):
         if not utils.is_sync(): return
-        self.clickSync()
+        self.clickSync(is_auto=True)
+        self._timer.setInterval(utils.get_setting("sync_frequency"))
 
     @normal
-    async def clickSync(self, *_):
+    async def clickSync(self, *_, is_auto=False):
         if self._synchronizer._synchronizing: return
         self._home.sync_btn.setEnabled(False)
         self._home.sync_btn.setText("Syncing...")
@@ -68,7 +69,8 @@ class App(QApplication):
         try:
             await self._synchronizer.sync()
         except Exception as e:
-            QMessageBox.critical(self._home, "Sync Error", str(e), QMessageBox.Yes)
+            if not is_auto:
+                QMessageBox.critical(self._home, "Sync Error", str(e), QMessageBox.Yes)
             logging.error(f"Synchronize failed: {e}")
         else:
             logging.info("Synchronize succeed.")

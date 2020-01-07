@@ -30,7 +30,7 @@ class WordLabel(QLabel):
     def mouseReleaseEvent(self, e):
         self.onMouseRelease.emit(e)
 
-class Danmuku(QWidget):
+class Danmaku(QWidget):
     onModified = pyqtSignal(str)
 
     def __init__(self, word, paraphrase, y, show_paraphrase = None, color = None):
@@ -43,9 +43,9 @@ class Danmuku(QWidget):
         self.modified = False
         self._show_paraphrase = show_paraphrase \
             if show_paraphrase is not None else \
-            utils.get_setting("danmuku_default_show_paraphrase")
+            utils.get_setting("danmaku_default_show_paraphrase")
         self._color = color if color is not None else \
-            utils.get_setting("danmuku_default_color")
+            utils.get_setting("danmaku_default_color")
         self._cleared = False
 
         self.setWindowFlags(
@@ -109,7 +109,7 @@ class Danmuku(QWidget):
         self._word_label.setStyleSheet(f"QLabel{{background-color:rgb({bg_color}); color:rgb({font_color}); padding:5; border-radius:6px}}")
 
     def initUI(self):
-        self.setWindowOpacity(utils.get_setting("danmuku_transparency"))
+        self.setWindowOpacity(utils.get_setting("danmaku_transparency"))
 
         word = WordLabel(self._word)
         if self.show_paraphrase:
@@ -212,7 +212,7 @@ class Danmuku(QWidget):
 
     def leaveWordEvent(self):
         if not self._show_detail:
-            self.setWindowOpacity(utils.get_setting("danmuku_transparency"))
+            self.setWindowOpacity(utils.get_setting("danmaku_transparency"))
 
     def mousePressWordEvent(self, e):
         if e.button() == Qt.LeftButton:
@@ -239,7 +239,7 @@ class Danmuku(QWidget):
     def initPosition(self, y):
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.update)
-        speed = utils.get_setting("danmuku_speed")
+        speed = utils.get_setting("danmaku_speed")
         self._timer.start(int(1 / speed))
 
         w = QDesktopWidget().availableGeometry().width()

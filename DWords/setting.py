@@ -25,16 +25,19 @@ class Setting(QDialog):
         setting = QTabWidget()
         body.addWidget(setting)
 
+        self._common_setting = QWidget()
         self._account_setting = QWidget()
-        self._danmuku_setting = QWidget()
+        self._danmaku_setting = QWidget()
         self._about = QWidget()
 
+        self.initCommonSetting()
         self.initAccountSetting()
-        self.initDanmukuSetting()
+        self.initDanmakuSetting()
         self.initAbout()
 
-        setting.addTab(self._account_setting, "Account Setting")
-        setting.addTab(self._danmuku_setting, "Danmuku Setting")
+        setting.addTab(self._common_setting, "Common")
+        setting.addTab(self._account_setting, "Account")
+        setting.addTab(self._danmaku_setting, "Danmaku")
         setting.addTab(self._about, "About")
 
         btns = QHBoxLayout()
@@ -50,6 +53,44 @@ class Setting(QDialog):
         btns.addWidget(cancel)
 
         body.addLayout(btns)
+
+    def initCommonSetting(self):
+        widget = self._common_setting
+        layout = QVBoxLayout()
+        widget.setLayout(layout)
+
+        dictionary = utils.get_setting("dictionary")
+        label_dict = QLabel("Dictionary: ")
+        combo_dict = QComboBox()
+        items = list(utils.DICT_TABLE_MAP.keys())
+        combo_dict.addItems(items)
+        combo_dict.setCurrentText(dictionary)
+        combo_dict.currentIndexChanged.connect(self.dictChanged)
+        dict_ = QHBoxLayout()
+        dict_.addWidget(label_dict)
+        dict_.addWidget(combo_dict)
+        layout.addLayout(dict_)
+        self._combo_dict = combo_dict
+
+        sync_frequency = utils.get_setting("sync_frequency")
+        label_sync_frequency = QLabel(f"Synchronous frequency: per {int(sync_frequency / 60000)}m")
+        layout.addWidget(label_sync_frequency)
+        self._label_sync_frequency = label_sync_frequency
+
+        slider_sync_frequency = QSlider(Qt.Horizontal)
+        slider_sync_frequency.setValue(utils.value2progress("sync_frequency", sync_frequency))
+        slider_sync_frequency.valueChanged.connect(self.syncFrequencyChanged)
+        layout.addWidget(slider_sync_frequency)
+
+        layout.addStretch(1)
+
+    def dictChanged(self, index):
+        self._data["dictionary"] = self._combo_dict.itemText(index)
+
+    def syncFrequencyChanged(self, progress):
+        value = utils.progress2value("sync_frequency", progress)
+        self._label_sync_frequency.setText(f"Synchronous frequency: per {int(value / 60000)}m")
+        self._data["sync_frequency"] = value
 
     def initAccountSetting(self):
         widget = self._account_setting
@@ -89,32 +130,32 @@ class Setting(QDialog):
     def accountSettingChanged(self, value):
         self._data[self.sender().key] = value
 
-    def initDanmukuSetting(self):
-        widget = self._danmuku_setting
+    def initDanmakuSetting(self):
+        widget = self._danmaku_setting
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
-        speed = utils.get_setting("danmuku_speed")
+        speed = utils.get_setting("danmaku_speed")
         label_speed = QLabel("Speed: %.2f" % (speed * 100))
         layout.addWidget(label_speed)
         self._label_speed = label_speed
 
         slider_speed = QSlider(Qt.Horizontal)
-        slider_speed.setValue(99 - utils.value2progress("danmuku_speed", speed))
+        slider_speed.setValue(99 - utils.value2progress("danmaku_speed", speed))
         slider_speed.valueChanged.connect(self.speedChanged)
         layout.addWidget(slider_speed)
 
-        frequency = utils.get_setting("danmuku_frequency")
+        frequency = utils.get_setting("danmaku_frequency")
         label_frequency = QLabel("Frequency: per %.2fs" % (frequency / 1000))
         layout.addWidget(label_frequency)
         self._label_frequency = label_frequency
 
         slider_frequency = QSlider(Qt.Horizontal)
-        slider_frequency.setValue(utils.value2progress("danmuku_frequency", frequency))
+        slider_frequency.setValue(utils.value2progress("danmaku_frequency", frequency))
         slider_frequency.valueChanged.connect(self.frequencyChanged)
         layout.addWidget(slider_frequency)
 
-        default_color = utils.get_setting("danmuku_default_color")
+        default_color = utils.get_setting("danmaku_default_color")
         label_color = QLabel("Default Color")
         layout.addWidget(label_color)
         colors = QHBoxLayout()
@@ -133,17 +174,17 @@ class Setting(QDialog):
 
         layout.addLayout(colors)
 
-        transparency = utils.get_setting("danmuku_transparency")
+        transparency = utils.get_setting("danmaku_transparency")
         label_transparency = QLabel(f"Transparency: {int(transparency * 100)}%")
         layout.addWidget(label_transparency)
         self._label_transparency = label_transparency
 
         slider_transparency = QSlider(Qt.Horizontal)
-        slider_transparency.setValue(utils.value2progress("danmuku_transparency", transparency))
+        slider_transparency.setValue(utils.value2progress("danmaku_transparency", transparency))
         slider_transparency.valueChanged.connect(self.transparencyChanged)
         layout.addWidget(slider_transparency)
 
-        default_show_paraphrase = utils.get_setting("danmuku_default_show_paraphrase")
+        default_show_paraphrase = utils.get_setting("danmaku_default_show_paraphrase")
         check_show_paraphrase = QCheckBox("Default show paraphrase")
         check_show_paraphrase.setChecked(default_show_paraphrase)
         check_show_paraphrase.toggled.connect(self.clickShowParaphrase)
@@ -151,27 +192,27 @@ class Setting(QDialog):
 
     def speedChanged(self, progress):
         progress = 99 - progress
-        value = utils.progress2value("danmuku_speed", progress)
+        value = utils.progress2value("danmaku_speed", progress)
         self._label_speed.setText("Speed: %.2f" % (value * 100))
-        self._data["danmuku_speed"] = value
+        self._data["danmaku_speed"] = value
 
     def frequencyChanged(self, progress):
-        value = utils.progress2value("danmuku_frequency", progress)
+        value = utils.progress2value("danmaku_frequency", progress)
         self._label_frequency.setText("Frequency: per %.2fs" % (value / 1000))
-        self._data["danmuku_frequency"] = value
+        self._data["danmaku_frequency"] = value
 
     def clickColor(self, e):
         if e:
             sender = self.sender()
-            self._data["danmuku_default_color"] = sender.color
+            self._data["danmaku_default_color"] = sender.color
 
     def transparencyChanged(self, progress):
-        value = utils.progress2value("danmuku_transparency", progress)
+        value = utils.progress2value("danmaku_transparency", progress)
         self._label_transparency.setText(f"Transparency: {int(value * 100)}%")
-        self._data["danmuku_transparency"] = value
+        self._data["danmaku_transparency"] = value
 
     def clickShowParaphrase(self, e):
-        self._data["danmuku_default_show_paraphrase"] = e
+        self._data["danmaku_default_show_paraphrase"] = e
 
     def initAbout(self):
         widget = self._about

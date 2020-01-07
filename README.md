@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.svg" alt="logo" width="100"></p>
 <h1 align="center">DWords</h1>
-<p align="center">Show words as Danmuku on the screen to helps you remember them.</p>
+<p align="center">Show words as Danmaku on the screen to helps you remember them.</p>
 
 [![PyPI Version](https://img.shields.io/pypi/v/DWords.svg)](https://pypi.org/project/DWords/)
 [![Build Status](https://api.travis-ci.org/luyuhuang/DWords.svg?branch=dev)](https://travis-ci.org/luyuhuang/DWords)
@@ -13,7 +13,7 @@
 
 ## Introduction
 
-DWords is a cross platform tool which show words as Danmuku on your screen to helps you remember them. The main purpose of DWords is to help non-English-speaking people study English, but not limited to English, you can also use it to remember anything you want.
+DWords is a cross platform tool which show words as Danmaku on your screen to helps you remember them. The main purpose of DWords is to help non-English-speaking people study English, but not limited to English, you can also use it to remember anything you want.
 
 Features:
 
@@ -49,7 +49,7 @@ Type `DWords` in you terminal to start DWords. If you downloaded binary distribu
 
 ### Add words
 
-Click "+" button and enter in the input box below to add words. The format is: the first line is the word, the second line is a short explanation and followed by detailed explanations. The short explanation can be displayed directly on the Danmuku, while the detailed explanation can only be displayed on the details panel. Detailed explanation is optional. For example:
+Click "+" button and enter in the input box below to add words. The format is: the first line is the word, the second line is a short explanation and followed by detailed explanations. The short explanation can be displayed directly on the Danmaku, while the detailed explanation can only be displayed on the details panel. Detailed explanation is optional. For example:
 
 ```
 word

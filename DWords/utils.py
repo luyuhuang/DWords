@@ -1,7 +1,8 @@
 import os
 import time
 import logging
-from .db import user_db
+import locale
+from .db import user_db, dictionary_db
 
 logging.basicConfig(format="[%(levelname)s] %(asctime)s | %(message)s",
                     level=logging.INFO)
@@ -61,18 +62,27 @@ def set_word_attribute(word, **kw):
         _on_modify(c, word, "add")
 
 DEFAULT_SETTING = {
+    "dictionary": "None",
+    "sync_frequency": 1000 * 60 * 10,
+
     "email": None,
     "password": None,
     "smtp_server": None,
     "pop3_server": None,
-    "sync_frequency": 1000 * 60 * 5,
 
-    "danmuku_speed": 1 / 12,
-    "danmuku_frequency": 6000,
-    "danmuku_default_show_paraphrase": False,
-    "danmuku_default_color": "white",
-    "danmuku_transparency": 0.5,
+    "danmaku_speed": 1 / 12,
+    "danmaku_frequency": 6000,
+    "danmaku_default_show_paraphrase": False,
+    "danmaku_default_color": "white",
+    "danmaku_transparency": 0.5,
 }
+
+try:
+    lang, _ = locale.getdefaultlocale()
+    if lang == "zh_CN":
+        DEFAULT_SETTING["dictionary"] = "EN-CN"
+except:
+    pass
 
 def get_setting(key):
     value = user_db.getOne("select value from setting where key = ?", (key,))
@@ -93,9 +103,10 @@ def is_sync():
     return count == 4
 
 VALUE_RANGE = {
-    "danmuku_speed": (1 / 9, 1 / 18),
-    "danmuku_frequency": (3000, 20000),
-    "danmuku_transparency": (0.3, 1.0),
+    "danmaku_speed": (1 / 9, 1 / 18),
+    "danmaku_frequency": (3000, 20000),
+    "danmaku_transparency": (0.3, 1.0),
+    "sync_frequency": (5 * 60 * 1000, 30 * 60 * 1000),
 }
 
 def progress2value(key, progress):
@@ -106,3 +117,14 @@ def value2progress(key, value):
     MIN, MAX = VALUE_RANGE[key]
     return int((value - MIN) / (MAX - MIN) * 99)
 
+DICT_TABLE_MAP = {
+    "None": None,
+    "EN-CN": "dict_en_cn"
+}
+def consult(word):
+    table = DICT_TABLE_MAP.get(get_setting("dictionary"))
+    if table is None: return None
+
+    res = dictionary_db.getOne(f"select paraphrase from {table} where word = ?", (word,))
+    if res is None: return None
+    return res[0]
