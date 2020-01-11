@@ -134,7 +134,7 @@ class Mail:
             last_id, = last_id
 
         get_count, read_count = 0, 0
-        for i in range(count, max(1, count - 50), -1):
+        for i in range(count, max(0, count - 50), -1):
             logging.debug(f"Retrieving mail {i}")
             _, lines, _ = await self._pop3_retr(i)
             msg = Parser(policy=policy.default).parsestr(b"\n".join(lines).decode("utf-8"))

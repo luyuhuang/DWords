@@ -1,2 +1,8 @@
 * text=auto
-*.sql linguist-vendored
+*.sql linguist-vendored text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.in text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.spec text eol=lf

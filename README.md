@@ -18,9 +18,10 @@ DWords is a cross platform tool which show words as Danmaku on your screen to he
 Features:
 
 - Open source and cross platform
-- Remember words while using a computer
+- Memorize words with ubiquitous Danmakus while using a computer
 - Synchronize between multiple devices by email
 - Add words using you phone by email
+- Included dictionaries
 
 ## Installation
 
@@ -59,6 +60,10 @@ a unit of language that native speakers can identify; a brief statement.
 
 And then click "Commit" button to add it, or press Ctrl + Enter.
 
+### Using dictionary
+
+DWords included dictionaries, click "Setting" button and set it in the "Common" tab. Currently only English-Chinese dictionary is supported, including more than 30,000 words. Once setting up the dictionary, the explanation will appear automatically when you press Enter while input a word.
+
 ### Synchronize
 
 DWords can synchronize words between multiple devices. In order to use this feature, you need to set up an account first. Click "Setting" button and set the email address, email password, SMTP server and POP3 server in the "Account" tab. DWords'll synchronize data via send emails, so we recommend using an infrequently used mailbox.
@@ -82,9 +87,11 @@ The content after "..." will be ignored.
 
 Then send the email to the mailbox you set up.
 
+If you have set up the dictionary, you don't have to specify the explanation and DWords'll consult the dictionary automatically.
+
 ## Contribution
 
-If you found any problems or have any suggestions, open an [issue](https://github.com/luyuhuang/DWords/issues). We also welcome all kinds of pull request.
+If you found any problems or have any suggestions, open an [issue](https://github.com/luyuhuang/DWords/issues). We also welcome all kinds of pull requests.
 
 ## License
 
