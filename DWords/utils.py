@@ -70,7 +70,7 @@ DEFAULT_SETTING = {
     "smtp_server": None,
     "pop3_server": None,
 
-    "danmaku_speed": 1 / 12,
+    "danmaku_speed": 1 / 10,
     "danmaku_frequency": 6000,
     "danmaku_default_show_paraphrase": False,
     "danmaku_default_color": "white",
@@ -103,7 +103,7 @@ def is_sync():
     return count == 4
 
 VALUE_RANGE = {
-    "danmaku_speed": (1 / 9, 1 / 18),
+    "danmaku_speed": (1 / 18, 1 / 5),
     "danmaku_frequency": (3000, 20000),
     "danmaku_transparency": (0.3, 1.0),
     "sync_frequency": (5 * 60 * 1000, 30 * 60 * 1000),

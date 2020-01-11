@@ -238,16 +238,22 @@ class Danmaku(QWidget):
 
     def initPosition(self, y):
         self._timer = QTimer(self)
+        self._timer.setTimerType(Qt.PreciseTimer)
         self._timer.timeout.connect(self.update)
         speed = utils.get_setting("danmaku_speed")
-        self._timer.start(int(1 / speed))
+        delta = 1
+        while round(delta / speed) < 17:
+            delta += 1
+
+        self._timer.start(round(delta / speed))
+        self._delta = delta
 
         w = QDesktopWidget().availableGeometry().width()
         self.move(w, y)
 
     def update(self):
         if self._stop_move: return
-        x = self.x() - 1
+        x = self.x() - self._delta
         self.move(x, self.y())
         if x < -self.width():
             self._timer.stop()

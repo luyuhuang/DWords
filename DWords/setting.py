@@ -141,7 +141,7 @@ class Setting(QDialog):
         self._label_speed = label_speed
 
         slider_speed = QSlider(Qt.Horizontal)
-        slider_speed.setValue(99 - utils.value2progress("danmaku_speed", speed))
+        slider_speed.setValue(utils.value2progress("danmaku_speed", speed))
         slider_speed.valueChanged.connect(self.speedChanged)
         layout.addWidget(slider_speed)
 
@@ -191,7 +191,6 @@ class Setting(QDialog):
         layout.addWidget(check_show_paraphrase)
 
     def speedChanged(self, progress):
-        progress = 99 - progress
         value = utils.progress2value("danmaku_speed", progress)
         self._label_speed.setText("Speed: %.2f" % (value * 100))
         self._data["danmaku_speed"] = value
