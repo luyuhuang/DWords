@@ -65,4 +65,4 @@ class Launcher(QObject):
         self._burst_words = set(map(lambda e: e[0], words))
         if not self._burst_words: return
 
-        self._timer.setInterval(700)
+        self._timer.setInterval(1500)

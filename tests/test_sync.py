@@ -43,7 +43,7 @@ def _delete_mails():
 def test_sync(qtbot):
     _delete_mails()
 
-    num, = user_db.getOne("select count(*) from sync_cache")
+    num, = user_db.getOne("select count(*) from sync_cache where op = 'add'")
 
     _sync()
     qtbot.waitUntil(lambda: not async_thread._coroutines, timeout=30000)
