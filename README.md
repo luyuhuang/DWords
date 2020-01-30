@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.svg" alt="logo" width="100"></p>
 <h1 align="center">DWords</h1>
-<p align="center">Show words as Danmaku on the screen to helps you remember them.</p>
+<p align="center">Show words as Danmaku on the screen to help you remember them.</p>
 
 [![PyPI Version](https://img.shields.io/pypi/v/DWords.svg)](https://pypi.org/project/DWords/)
 [![Build Status](https://api.travis-ci.org/luyuhuang/DWords.svg?branch=dev)](https://travis-ci.org/luyuhuang/DWords)
@@ -13,7 +13,7 @@
 
 ## Introduction
 
-DWords is a cross platform tool which show words as Danmaku on your screen to helps you remember them. The main purpose of DWords is to help non-English-speaking people study English, but not limited to English, you can also use it to remember anything you want.
+DWords is a cross platform tool which show words as Danmaku on your screen to help you memorize them. The main purpose of DWords is to help non-English-speaking people study English, but not limited to English, you can also use it to memorize anything you want.
 
 Features:
 
@@ -46,11 +46,11 @@ If you don't know Python, we also provide binary distributions for Windows. Clic
 
 ## Usage
 
-Type `DWords` in you terminal to start DWords. If you downloaded binary distributions, double click `DWords.exe` to start it.
+Type `DWords` in your terminal to start DWords. If you download binary distributions, double click `DWords.exe` to start it.
 
 ### Add words
 
-Click "+" button and enter in the input box below to add words. The format is: the first line is the word, the second line is a short explanation and followed by detailed explanations. The short explanation can be displayed directly on the Danmaku, while the detailed explanation can only be displayed on the details panel. Detailed explanation is optional. For example:
+Click "+" button and enter into the input box below to add words. The format is: the first line is the word, the second line is a short explanation and followed by detailed explanations. The short explanation can be displayed directly on the Danmaku, while the detailed explanations can only be displayed on the details panel. Detailed explanation is optional. For example:
 
 ```
 word
@@ -70,7 +70,7 @@ DWords can synchronize words between multiple devices. In order to use this feat
 
 ### Add words by email
 
-Once setting up the account, you can add add words by sending email to the set up mailbox. Edit a email using any email client, with the subject "DWords add" and the format of content is similar to add words, but you can add more then one words, separated by triple dash "---" or triple comma ",,,"; Triple swung dash "~~~" or triple dot "..." tells DWords it's the end. For example:
+Once setting up the account, you can add add words by sending email to the set up mailbox. Edit a email using any email client, with the subject "DWords add" and the format of content is similar to add words, but you can add more than one word, separated by triple dash "---" or triple comma ",,,"; Triple swung dash "~~~" or triple dot "..." tells DWords it's the end. For example:
 
 ```
 world
@@ -91,8 +91,8 @@ If you have set up the dictionary, you don't have to specify the explanation and
 
 ## Contribution
 
-If you found any problems or have any suggestions, open an [issue](https://github.com/luyuhuang/DWords/issues). We also welcome all kinds of pull requests.
+If you find any problems or have any suggestions, open an [issue](https://github.com/luyuhuang/DWords/issues). We also welcome all kinds of pull requests.
 
 ## License
 
-DWords is distributed under the [GPLv3 License](https://github.com/luyuhuang/DWords/blob/dev/LICENSE) since PyQt5 is licensed under the GPLv3 (so we have no choice). You can use it for free and modify it freely, but when you modify it you have to open source with the same license.
+DWords is distributed under the [GPLv3 License](https://github.com/luyuhuang/DWords/blob/dev/LICENSE) because PyQt5 is licensed under the GPLv3 (so we have no choice). You can use it for free and modify it freely, but you have to open source with the same license when you modify it.

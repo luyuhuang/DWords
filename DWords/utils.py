@@ -40,7 +40,7 @@ def add_words(*words):
     now = clock()
     with user_db.cursor() as c:
         for word, paraphrase in words:
-            c.execute("update words set paraphrase = ?, modify_time = ? "
+            c.execute("update words set paraphrase = ?, modify_time = ?, cleared = 0 "
                 "where word = ?", (paraphrase, now, word))
             c.execute("insert or ignore into words(word, paraphrase) "
                 "values(?, ?)", (word, paraphrase))
