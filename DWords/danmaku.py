@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont, QMouseEvent
 from PyQt5.QtCore import QTimer, Qt, QEvent, pyqtSignal, QRect
 from . import utils
+import logging
 
 class WordLabel(QLabel):
     onEnter = pyqtSignal()
@@ -226,6 +227,8 @@ class Danmaku(QWidget):
             e.accept()
 
     def mouseReleaseWordEvent(self, e):
+        if e.button() != Qt.LeftButton:
+            return
         if (e.globalPos() - self._press_start).manhattanLength() < 10:
             self._show_detail = not self._show_detail
             if self._show_detail:
