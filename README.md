@@ -1,3 +1,7 @@
+> This repository is out of date. Try to use the new version: <https://github.com/luyuhuang/DWords2>.
+>
+> 这个仓库已经过时了. 试试用新版本: <https://github.com/luyuhuang/DWords2>.
+
 <p align="center"><img src="logo.svg" alt="logo" width="100"></p>
 <h1 align="center">DWords</h1>
 <p align="center">Show words as Danmaku on the screen to help you remember them.</p>
